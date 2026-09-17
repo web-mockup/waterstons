@@ -71,7 +71,7 @@ body{margin:0;background:var(--navy);color:var(--on-navy);
   font-family:var(--sans);font-size:17px;line-height:1.6;
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 img,svg{display:block;max-width:100%}
-img{height:auto}                 /* B's image bug, fixed by construction here */
+img{height:auto}                 /* never let an HTML height attribute become a CSS height */
 a{color:inherit}
 h1,h2,h3,p,ul,ol,figure{margin:0}
 ul,ol{padding:0;list-style:none}
@@ -164,17 +164,14 @@ ul,ol{padding:0;list-style:none}
    number is making. "Circa 4%, reported following initial pilot rollout" is
    the claim. "4%" on its own is a different claim, and an untrue one.
 
-   The two sizes are ONE declaration, not two that happen to look right. The
-   first version of this rule set them as independent clamps and asserted in a
-   comment that the ratio held; measured, it was 25% against a 40% floor. So
-   the ratio is now arithmetic the browser does:
+   The two sizes are ONE declaration rather than two that have to be kept in
+   step, so the relationship is arithmetic the browser does:
 
      qualifier = max(19px, figure x 0.44)
 
    The figure floors at 44px, so 19px is never less than 43.2% of it, and the
    qualifier is never below 19px, which is above the 17px body at every width.
-   Both halves of the criterion hold at every viewport by construction rather
-   than at 1440 by luck. Still measured at the gate. */
+   Both halves hold at every viewport by construction rather than at one. */
 .c-fig{display:block;--fig:clamp(44px,6vw,86px)}
 [data-motion] .c-fig{--fig:clamp(52px,7vw,104px)}
 .c-fig__n{display:block;font-family:var(--serif);font-weight:300;line-height:1;
@@ -233,18 +230,15 @@ ul,ol{padding:0;list-style:none}
    aria-hidden, and an abstraction of the device rather than the lockup: a mark
    presented incomplete is not a thing to do to a client's trademark. */
 /* Lower right, below the headline's last line and clear of the standfirst,
-   which is capped at 50ch. Centring it vertically put arc strokes through the
-   middle of the opening headline. I looked at that in a screenshot and decided
-   it read as a watermark; the differential check disagreed and the check is
-   right, because a 1px stroke through the counter of a letterform is damage at
-   any opacity. */
+   which is capped at 50ch. A hairline through the counter of a letterform is
+   damage rather than a watermark, at any opacity, so the geometry keeps to
+   space the type does not use. */
 .c-arcs{position:absolute;right:-13%;top:auto;bottom:-20%;
   width:min(42vw,480px);height:auto;z-index:1;pointer-events:none}
 .c-arcs path{fill:none;stroke:var(--green);stroke-width:1.25;opacity:.2}
 /* Same rule as the other two acts that draw this geometry: below 900px there
    is no column to reserve for it, so it goes rather than crossing the type.
-   The earlier version merely moved and faded it, which put arc strokes through
-   the opening headline at phone widths. */
+   Moving it and lowering its opacity is not a substitute for removing it. */
 @media (max-width:900px){.c-arcs{display:none}}
 
 /* ---------- C2b. Four peers, four rows ----------------------------------- */
@@ -285,11 +279,9 @@ ul,ol{padding:0;list-style:none}
    script; at rest --s is 1, so the geometry is complete and the act looks
    finished rather than blank when nothing runs.
 
-   The device is given the right hand third and the text keeps the left, because
-   the first build of this act drew arc strokes straight through the middle of
-   every figure and label. Option B learned the same lesson once already. Ink
+   The device is given the right hand third and the text keeps the left. Ink
    over letterforms is not a background, it is damage, and no amount of low
-   opacity fixes a 1px stroke through the counter of an O. */
+   opacity fixes a hairline through the counter of an O. */
 .c-scrub__bg svg{position:absolute;left:auto;right:-13%;top:50%;
   width:min(74vw,860px);height:auto;transform:translateY(-50%)}
 .c-scrub__bg path{fill:none;stroke:var(--green);stroke-width:1;opacity:.24;
@@ -406,8 +398,8 @@ ul,ol{padding:0;list-style:none}
    ============================================================ */
 /* One rule for all three acts that draw the geometry, C1, C3 and C7: the
    reading column is on the left, the geometry is on the right, and below
-   900px the geometry is dropped rather than overlapped. Enforced by counting
-   painted pixels inside text boxes, not by eye. */
+   900px the geometry is dropped rather than overlapped. Verified by comparing
+   rendered pixels inside each line of text, not by eye. */
 .c-close{position:relative;overflow:hidden;min-height:clamp(560px,86vh,860px);
   display:flex;align-items:center;padding-block:clamp(64px,9vw,120px)}
 .c-close__bg{position:absolute;inset:0;pointer-events:none}
@@ -424,15 +416,12 @@ ul,ol{padding:0;list-style:none}
 @media (min-width:901px){.c-close__body{max-width:56%}}
 @media (max-width:900px){.c-close__bg{display:none}}
 .c-close__in{position:relative;z-index:1;width:100%}
-/* auto-fit with a real minimum, not three forced columns.
-   repeat(3, minmax(0, 1fr)) lets a column shrink below its content, and once
-   .c-close__body narrowed this block to 56% of the frame the columns fell to
-   about 195px while "info@waterstons.com" needs roughly 200px at 21px. The
-   address then ran straight into the office list with no space between them:
-   "info@waterstons.comDurham, London,". It was clean at 1280 and broken at
-   1440 and 1024, which is what a collapsing gap looks like rather than one
-   wrong rule, so the fix is a floor rather than another breakpoint.
-   min(100%, 230px) keeps it valid when the container is narrower than 230px. */
+/* auto-fit with a real minimum, not a fixed number of columns.
+   repeat(3, minmax(0, 1fr)) would let a column shrink below its content, and
+   this block is already narrowed to 56% of the frame, so the email address
+   would be given less width than it needs and run into its neighbour. A floor
+   answers that at every size; another breakpoint only moves it.
+   min(100%, 230px) keeps the floor valid when the container is narrower. */
 .c-close__c{display:grid;gap:clamp(20px,3vw,40px);margin-top:clamp(30px,4.4vw,56px);
   grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
 .c-close__c a{font-size:clamp(17px,1.6vw,21px);text-decoration:none;border-bottom:1px solid var(--rule-navy);padding-bottom:6px;display:inline-block}

@@ -2,8 +2,7 @@
 
    Zero third party. CSS sticky, transforms, and one requestAnimationFrame.
 
-   Two rules this file exists to honour, both of them learned the hard way
-   earlier in this project:
+   Two rules this file exists to honour:
 
    1. The stylesheet at rest is the finished page. This script only ever adds
       data-motion, and only after it has proved it can run. If it throws, the
@@ -71,11 +70,11 @@
       };
 
       /* A focus landing on an off screen panel makes the browser scroll the
-         overflow:hidden viewport to reveal it, which slides the track out of
-         step with the transform and leaves the act visibly broken. So the
-         viewport's own scroll is pushed back to zero and the page is scrolled
-         to the equivalent position instead. The panel still gets revealed,
-         which is the part that matters for a keyboard. */
+         overflow:hidden viewport to reveal it, which would slide the track out
+         of step with the transform. So the viewport's own scroll is pushed
+         back to zero and the page is scrolled to the equivalent position
+         instead. The panel is still revealed, which is what matters for a
+         keyboard. */
       vp.addEventListener('scroll', function () {
         if (vp.scrollLeft !== 0) { vp.scrollLeft = 0; }
       }, { passive: true });
@@ -93,12 +92,7 @@
            Focusing an element makes the browser scroll to reveal it, and with
            scroll-behavior:smooth that scroll is animated over several hundred
            milliseconds. Any "is the panel already in view" test run during it
-           reads a position the browser is in the middle of changing and gets
-           the answer wrong. Two versions of this failed that way: the first
-           compared against a stale progress value, the second waited one frame
-           and measured pixels while the animation had barely started. Both
-           concluded panel one was fine and left it off the left of the screen
-           with focus inside it.
+           reads a value the browser is in the middle of changing.
 
            So this computes the target from the panel index, which does not
            depend on when it runs, and issues its own scroll. That supersedes
@@ -217,8 +211,9 @@
       io.observe(el);
     });
 
-    /* The landing screen animates. Marking it on immediately, which is what
-       the first build did, is exactly why the top of the page read as static. */
+    /* The landing screen animates too. Marking what is already on screen as
+       arrived, rather than playing it, is what makes a page with a full motion
+       layer still read as static at the top. */
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         onscreen.forEach(function (el, i) {
