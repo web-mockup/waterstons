@@ -649,7 +649,7 @@ body[data-thinking="on"] .w-think{display:block}
   .w-index__i.is-here .w-index__a::before{transform:scaleX(1);opacity:1}
 }
 
-/* ---- Magnetic buttons, as the reference does ---- */
+/* ---- Magnetic buttons ---- */
 .w-btn{will-change:transform}
 
 /* ---- Media wipe ---- */

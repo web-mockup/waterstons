@@ -1,0 +1,335 @@
+/* ============================================================
+   Waterstons concept, Option B. A narrow label column, all content
+   indented into the right column, a light serif, and colour only
+   from photography.
+
+     ground   #ffffff
+     ink      #152943          Waterstons navy, in place of black
+     display  300 to 500       never 700
+     label    12px / 500 / 0.6px letter-spacing
+     frame    1280px
+     offset   content starts at 34% of the content box
+   ============================================================ */
+
+/* ---------- Fonts ---------- */
+@font-face{font-family:"Newsreader";src:url("../../../assets/fonts/newsreader-var.woff2") format("woff2");
+  font-weight:300 700;font-style:normal;font-display:swap}
+@font-face{font-family:"Poppins";src:url("../../../assets/fonts/poppins-400.woff2") format("woff2");
+  font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Poppins";src:url("../../../assets/fonts/poppins-500.woff2") format("woff2");
+  font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Poppins";src:url("../../../assets/fonts/poppins-600.woff2") format("woff2");
+  font-weight:600;font-style:normal;font-display:swap}
+/* metric matched to local Georgia, computed from the real font files, so a
+   swap moves nothing: size-adjust 96.95%, ascent 75.81%, descent 27.33% */
+@font-face{font-family:"Newsreader Fallback";src:local("Georgia");
+  size-adjust:96.95%;ascent-override:75.81%;descent-override:27.33%;line-gap-override:0%}
+
+:root{
+  --ground:#ffffff;
+  --ink:#152943;
+  --ink-2:#55616f;          /* 6.31 on white */
+  --ink-3:#66717f;          /* 4.96 on white */
+  --rule:rgba(21,41,67,.13);
+  --navy:#152943;
+  --on-navy:#ffffff;
+  --on-navy-2:#a3adb8;      /* 6.45 on navy */
+  --rule-navy:rgba(255,255,255,.16);
+  --green:#78fa93;
+
+  --serif:"Newsreader","Newsreader Fallback",Georgia,serif;
+  --sans:"Poppins",system-ui,-apple-system,sans-serif;
+
+  --frame:1280px;
+  --edge:clamp(20px,4.4vw,64px);
+  --col:34%;                /* the offset: content starts here */
+  --gap:clamp(20px,3vw,44px);
+  --band:clamp(52px,7.2vw,104px);
+
+  /* nothing slower than .8s */
+  --ease:cubic-bezier(.4,0,.2,1);
+  --ease-out:cubic-bezier(.19,1,.22,1);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg,video{display:block;max-width:100%}
+a{color:inherit}
+ul,ol{margin:0;padding:0;list-style:none}
+h1,h2,h3,p{margin:0}
+button{font:inherit}
+
+/* The ring follows the ground. Navy on white reads 14.68, green on navy 11.11,
+   and green on white would be 1.19 and effectively invisible. */
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.t-navy :focus-visible{outline-color:var(--green)}
+[hidden]{display:none !important}
+
+.t-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.t-skip{position:absolute;left:-9999px;top:0;z-index:300;background:var(--ink);
+  color:#fff;padding:12px 18px;font-size:13px;text-decoration:none}
+.t-skip:focus{left:0}
+
+/* ---------- Frame and the offset grid ---------- */
+.t-frame{max-width:var(--frame);margin-inline:auto;padding-inline:var(--edge)}
+
+/* The signature: a narrow left column that holds a label, or an index of
+   labels. Never prose, never media, never a control. */
+.t-row{display:grid;grid-template-columns:1fr;gap:18px}
+@media (min-width:900px){
+  .t-row{grid-template-columns:var(--col) 1fr;gap:0 var(--gap)}
+}
+
+.t-sec{padding-block:var(--band)}
+.t-sec--tight{padding-block:calc(var(--band) * .55)}
+
+/* the hairline above each label, running the full frame */
+.t-rule{border:0;border-top:1px solid var(--rule);margin:0}
+.t-navy .t-rule{border-top-color:var(--rule-navy)}
+
+/* ---------- The label column ---------- */
+.t-lab{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--ink);padding-top:22px;margin:0;
+  display:flex;align-items:baseline;gap:8px}
+.t-navy .t-lab{color:var(--on-navy)}
+/* the label pins while its section is in view */
+@media (min-width:900px){
+  .t-lab{position:sticky;top:78px;align-self:start}
+}
+/* the arcs, second and last appearance: a 12px ink glyph on the label */
+.t-lab__m{flex:none;width:11px;height:11px;opacity:.55}
+.t-lab__m path{fill:none;stroke:currentColor;stroke-width:2.4}
+
+/* an index of labels, the one permitted variation on the label column */
+.t-index{padding-top:22px;display:grid;gap:11px}
+@media (min-width:900px){.t-index{position:sticky;top:78px;align-self:start}}
+.t-index a{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.6px;
+  text-transform:uppercase;text-decoration:none;color:var(--ink-3);
+  transition:color .2s var(--ease);display:block;min-height:24px;line-height:24px}
+.t-index a:hover,.t-index a[aria-current="true"]{color:var(--ink)}
+
+/* ---------- Content column ---------- */
+.t-col{padding-top:22px;min-width:0}
+
+/* ---------- Display type: large but never heavy ---------- */
+.t-d1{font-family:var(--serif);font-weight:300;font-size:clamp(2.1rem,4.6vw,3.4rem);
+  line-height:1.2;letter-spacing:-.005em;max-width:20ch}
+.t-d2{font-family:var(--serif);font-weight:300;font-size:clamp(1.7rem,3.2vw,2.6rem);
+  line-height:1.24;letter-spacing:-.005em;max-width:24ch}
+.t-d3{font-family:var(--serif);font-weight:400;font-size:clamp(1.15rem,1.7vw,1.4rem);
+  line-height:1.3;letter-spacing:-.005em}
+/* the statement whose underlined phrases are the navigation */
+.t-stmt{font-family:var(--serif);font-weight:300;font-size:clamp(1.5rem,2.9vw,2.3rem);
+  line-height:1.34;letter-spacing:-.005em;max-width:30ch}
+.t-stmt a{text-decoration:underline;text-underline-offset:4px;
+  text-decoration-thickness:1px;transition:color .2s var(--ease)}
+.t-stmt a:hover{color:var(--ink-2)}
+
+.t-body{font-size:16px;line-height:1.6;color:var(--ink-2);max-width:62ch}
+.t-navy .t-body{color:var(--on-navy-2)}
+.t-note{font-family:var(--sans);font-size:13px;line-height:1.5;color:var(--ink-3)}
+.t-note a{display:inline-flex;align-items:center;min-height:24px}
+.t-navy .t-note{color:var(--on-navy-2)}
+
+/* ---------- The one live line under the headline ---------- */
+.t-live{display:flex;align-items:flex-start;gap:11px;margin-top:26px;
+  font-size:14px;line-height:1.5;color:var(--ink-2);max-width:56ch}
+.t-live b{font-weight:600;color:var(--ink)}
+.t-live__i{flex:none;width:16px;height:16px;margin-top:2px;color:var(--ink)}
+
+/* ---------- Buttons: exactly two ---------- */
+.t-btn{display:inline-flex;align-items:center;gap:9px;min-height:44px;
+  padding:11px 22px;border-radius:100px;font-family:var(--sans);font-size:12px;
+  font-weight:600;letter-spacing:.6px;text-transform:uppercase;text-decoration:none;
+  border:1px solid transparent;cursor:pointer;transition:background-color .2s var(--ease),
+  color .2s var(--ease),border-color .2s var(--ease)}
+.t-btn--solid{background:var(--ink);color:#fff}
+.t-btn--solid:hover{background:var(--green);color:var(--ink)}
+.t-btn--ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.t-btn--ghost:hover{border-color:var(--ink)}
+.t-navy .t-btn--solid{background:var(--green);color:var(--ink)}
+.t-navy .t-btn--solid:hover{background:#fff}
+.t-navy .t-btn--ghost{color:var(--on-navy);border-color:var(--rule-navy)}
+.t-navy .t-btn--ghost:hover{border-color:var(--on-navy)}
+.t-btn svg{flex:none}
+
+/* ---------- Media, and the caption that ships with it ---------- */
+/* No media block ships without its caption, at any width. The photograph at
+   scale is the most imitable thing on any of these sites; the caption in their
+   own voice is what makes it theirs. The two are one device. */
+.t-media{margin:0}
+/* height:auto, or the img keeps its HTML height attribute as a CSS height and
+   every box becomes a portrait slot that cover then crops hard into. */
+.t-media img,.t-media video{width:100%;height:auto;object-fit:cover}
+/* Only the reel forces a ratio, so the cards line up. 3:2 is the native ratio
+   of three of the four photographs in it, so it crops almost nothing. */
+.t-reel .t-media img{aspect-ratio:3/2}
+/* A document cover is not a photograph and must not be cropped at all. */
+.t-media--doc img{aspect-ratio:auto;object-fit:contain}
+.t-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 24px;
+  margin-top:14px;font-family:var(--sans);font-size:14px;line-height:1.5}
+.t-cap__n{color:var(--ink)}
+.t-cap__d{color:var(--ink-3);text-align:right}
+.t-navy .t-cap__n{color:var(--on-navy)}
+.t-navy .t-cap__d{color:var(--on-navy-2)}
+/* a narrow figure has no room to justify a caption across its width */
+.t-media--doc .t-cap{display:block}
+.t-media--doc .t-cap__d{display:block;text-align:left;margin-top:3px}
+/* <b> defaults to 700, which is outside the type scale */
+b,strong{font-weight:600}
+
+/* ---------- The carousel: the one element that refuses the container ---------- */
+.t-reel{display:flex;gap:var(--gap);overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;padding-block:4px;
+  /* bleeds both edges: it is the only thing on the page that does */
+  margin-inline:calc(-1 * var(--edge));padding-inline:var(--edge);
+  scroll-padding-inline-start:var(--edge)}
+.t-reel::-webkit-scrollbar{display:none}
+.t-reel > *{scroll-snap-align:start;flex:0 0 min(78vw,560px)}
+@media (min-width:900px){
+  /* past the container, out to the viewport edge. Everything else on the page
+     obeys the frame; the work does not, which is why it reads as the loud thing */
+  .t-reel{margin-inline:0 min(0px,calc((var(--frame) - 100vw) / 2 - var(--edge)));
+    padding-inline:0;scroll-padding-inline-start:0}
+  .t-reel > *{flex:0 0 min(46vw,560px)}
+}
+
+/* ---------- Stacked rows ---------- */
+.t-list{display:grid}
+.t-item{border-top:1px solid var(--rule);padding-block:20px}
+.t-item:first-child{border-top:0}
+.t-navy .t-item{border-top-color:var(--rule-navy)}
+.t-item__a{display:grid;grid-template-columns:1fr auto;gap:4px 20px;align-items:baseline;
+  text-decoration:none;transition:color .2s var(--ease)}
+.t-item__a:hover{color:var(--ink-2)}
+.t-item__d{display:block;grid-column:1/-1;font-size:14px;line-height:1.6;color:var(--ink-2);max-width:60ch}
+/* a row that is not a link is not a grid, so its parts have to stack themselves */
+.t-item > .t-d3{display:block}
+.t-item > .t-item__d{margin-top:7px}
+.t-navy .t-item__d{color:var(--on-navy-2)}
+
+/* ---------- The one navy band ---------- */
+.t-navy{background:var(--navy);color:var(--on-navy)}
+/* the arcs, first appearance: once, at scale, on navy, in green */
+.t-arcs{position:absolute;right:0;bottom:0;width:min(38vw,420px);opacity:.9;
+  pointer-events:none}
+.t-arcs path{fill:none;stroke:var(--green);stroke-width:1.5}
+
+/* ---------- Header ---------- */
+.t-head{position:sticky;top:0;z-index:100;background:var(--ground);
+  border-bottom:1px solid transparent;transition:border-color .2s var(--ease)}
+.t-head[data-stuck]{border-bottom-color:var(--rule)}
+.t-head__in{display:flex;align-items:center;gap:16px;padding-block:18px}
+.t-logo{flex:none;display:flex;align-items:center;min-height:44px;text-decoration:none}
+.t-logo img{width:122px}
+.t-head__r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.t-icon{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-width:44px;min-height:44px;padding:0 10px;border:0;border-radius:100px;
+  background:transparent;color:var(--ink);font-family:var(--sans);font-size:12px;
+  font-weight:500;letter-spacing:.6px;cursor:pointer;transition:color .2s var(--ease)}
+.t-icon:hover{color:var(--ink-2)}
+.t-navy .t-icon:hover{color:var(--on-navy-2)}
+/* Below 640 the header keeps the wordmark and the controls only. Contact
+   moves into the menu rather than being squeezed. */
+@media (max-width:639px){
+  .t-head__in .t-btn{display:none}
+  .t-logo img{width:104px}
+  .t-icon{min-width:40px;padding:0 6px}
+  .t-head__r{gap:2px}
+}
+
+/* the pinned section label, under the wordmark */
+.t-head__now{font-family:var(--sans);font-size:11px;font-weight:500;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--ink-3);line-height:1;margin-top:3px}
+
+/* ---------- Logo row ---------- */
+.t-logos{display:grid;grid-template-columns:repeat(2,1fr);gap:26px var(--gap);align-items:center}
+@media (min-width:640px){.t-logos{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:1000px){.t-logos{grid-template-columns:repeat(5,1fr)}}
+.t-logos img{width:auto;height:auto;max-height:26px;max-width:100%;object-fit:contain}
+
+/* ---------- Accreditation marks ---------- */
+.t-marks{display:grid;grid-template-columns:repeat(2,1fr);gap:22px var(--gap);align-items:center}
+@media (min-width:640px){.t-marks{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:1000px){.t-marks{grid-template-columns:repeat(5,1fr)}}
+.t-marks img{width:auto;height:auto;max-height:54px;max-width:100%;object-fit:contain}
+
+/* ---------- Figures ---------- */
+.t-figs{display:grid;grid-template-columns:repeat(2,1fr);gap:30px var(--gap)}
+@media (min-width:900px){.t-figs{grid-template-columns:repeat(4,1fr)}}
+.t-fig__n{display:block;font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.9rem,3.4vw,2.7rem);line-height:1;letter-spacing:-.01em;
+  font-variant-numeric:tabular-nums}
+.t-fig__l{display:block;font-size:13px;line-height:1.5;color:var(--ink-2);margin-top:10px;max-width:26ch}
+.t-navy .t-fig__l{color:var(--on-navy-2)}
+
+/* ---------- Outcomes list ---------- */
+.t-plus{display:grid;gap:16px}
+.t-plus li{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline;
+  font-family:var(--serif);font-weight:400;font-size:clamp(1.05rem,1.6vw,1.3rem);line-height:1.35}
+.t-plus li::before{content:"+";color:var(--ink-3);font-family:var(--sans);font-size:14px}
+
+/* ---------- Accordion ---------- */
+.t-acc__i{border-top:1px solid var(--rule)}
+.t-acc__b{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:start;width:100%;
+  padding:20px 0;border:0;background:none;cursor:pointer;text-align:left;color:var(--ink);
+  font-family:var(--serif);font-weight:400;font-size:clamp(1.02rem,1.5vw,1.22rem);line-height:1.32}
+.t-acc__ic{position:relative;width:14px;height:14px;margin-top:.42em;flex:none}
+.t-acc__ic::before,.t-acc__ic::after{content:"";position:absolute;background:var(--ink);
+  transition:transform .2s var(--ease),opacity .2s var(--ease)}
+.t-acc__ic::before{left:0;top:6px;width:14px;height:1.5px}
+.t-acc__ic::after{left:6px;top:0;width:1.5px;height:14px}
+.t-acc__b[aria-expanded="true"] .t-acc__ic::after{transform:scaleY(0);opacity:0}
+.t-acc__p{padding:0 0 22px}
+.t-acc__p p{margin:0;font-size:15px;line-height:1.66;color:var(--ink-2);max-width:66ch}
+
+/* ---------- Forms ---------- */
+.t-form{display:grid;gap:18px;max-width:560px}
+.t-cols{display:grid;gap:18px}
+@media (min-width:620px){.t-cols{grid-template-columns:1fr 1fr}}
+.t-field{display:grid;gap:7px}
+.t-field label{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--ink-3)}
+.t-navy .t-field label{color:var(--on-navy-2)}
+.t-field input,.t-field textarea{font:inherit;font-family:var(--sans);font-size:15px;
+  color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--rule);
+  border-radius:0;padding:9px 2px;min-height:44px;width:100%}
+.t-navy .t-field input,.t-navy .t-field textarea{color:var(--on-navy);
+  border-bottom-color:rgba(255,255,255,.45)}
+.t-field textarea{min-height:104px;resize:vertical;line-height:1.6}
+.t-field input:focus:not(:focus-visible),.t-field textarea:focus:not(:focus-visible){
+  outline:0;border-bottom-color:var(--ink)}
+.t-navy .t-field input:focus,.t-navy .t-field textarea:focus{border-bottom-color:var(--green)}
+.t-field input:focus,.t-field textarea:focus{border-bottom-color:var(--ink)}
+.t-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* ---------- Footer ---------- */
+.t-foot{padding-block:var(--band) 30px}
+.t-foot__cols{display:grid;gap:30px var(--gap);grid-template-columns:1fr}
+@media (min-width:700px){.t-foot__cols{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1000px){.t-foot__cols{grid-template-columns:repeat(4,1fr)}}
+.t-foot h3{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--on-navy);margin-bottom:14px}
+.t-foot a{text-decoration:none;color:var(--on-navy-2);font-size:14px;line-height:2;
+  display:inline-flex;align-items:center;min-height:24px;transition:color .2s var(--ease)}
+.t-foot a:hover{color:var(--on-navy)}
+.t-legal{margin-top:44px;padding-top:20px;border-top:1px solid var(--rule-navy);
+  font-size:12px;line-height:1.7;color:var(--on-navy-2)}
+
+/* ---------- Motion: short, small, and nothing draws itself ---------- */
+/* Transform only. A fade fails contrast for the whole of its duration, and an
+   auditor sampling mid transition reads the faded value, so text may move but
+   it may never fade. That applies to the figure too, because its caption is
+   text and fading the figure would fade the caption with it. */
+.t-in{transform:translateY(14px);transition:transform .5s var(--ease-out)}
+.t-in.is-on{transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  .t-in{transform:none !important}
+}
+@media print{.t-head,.b-switch{display:none}body{background:#fff;color:#000}}
