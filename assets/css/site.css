@@ -432,19 +432,6 @@ h3{font-size:clamp(1.15rem,1.6vw,1.4rem);line-height:1.2;letter-spacing:-.018em}
 .w-sfoot{border-top:1px solid var(--rule);padding-top:16px;font-size:13px;color:var(--ink-faint)}
 
 /* ---------- Presentation aids ---------- */
-/* Sits above the option switcher, which is pinned to the same place. The
-   switcher publishes the height it occupies; 18px is the resting value for a
-   page with no switcher on it, so removing the mockup device needs no edit. */
-.w-journey{position:fixed;left:50%;transform:translateX(-50%);
-  bottom:var(--b-switch-clear, 18px);z-index:150;
-  display:none;align-items:center;gap:14px;background:var(--navy);color:#fff;
-  border-radius:999px;padding:7px 8px 7px 20px;font-size:13px;
-  box-shadow:0 12px 34px rgba(15,31,52,.28);max-width:calc(100% - 2rem)}
-.w-journey[data-on="1"]{display:flex}
-.w-journey b{font-weight:600;white-space:nowrap}
-.w-journey a{min-height:36px;display:inline-flex;align-items:center;gap:7px;
-  background:var(--green);color:var(--navy);text-decoration:none;font-weight:600;
-  padding:7px 16px;border-radius:999px;white-space:nowrap}
 .w-tt{position:fixed;right:18px;bottom:18px;z-index:150;display:inline-flex;align-items:center;
   gap:9px;min-height:40px;padding:9px 18px;border-radius:999px;cursor:pointer;
   background:var(--navy);color:#fff;border:0;font:inherit;font-size:13px;font-weight:600;
@@ -564,7 +551,6 @@ body[data-thinking="on"] .w-think{display:block}
      switcher publishes, so the stack stays in order if any of them changes size
      and collapses to sensible resting values if the switcher is not there. */
   .w-tt{right:12px;bottom:var(--b-switch-clear, 70px);font-size:12px}
-  .w-journey{bottom:calc(var(--b-switch-clear, 18px) + 50px)}
   .w-peek{display:none}
 }
 
@@ -578,7 +564,7 @@ body[data-thinking="on"] .w-think{display:block}
   .w-wipe img{transform:none}
   .w-curtain,.w-peek,.w-progress{display:none !important}
 }
-@media print{.w-header,.w-journey,.w-tt,.w-search,.w-progress{display:none}body{font-size:11pt}}
+@media print{.w-header,.w-tt,.w-search,.w-progress{display:none}body{font-size:11pt}}
 
 /* ---------- Journey launcher. A guide, not part of the site. -------- */
 .w-steps{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}

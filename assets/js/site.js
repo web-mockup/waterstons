@@ -418,30 +418,33 @@
   }
 
   /* ---- Show our thinking ------------------------------------------- */
+  /* The annotations are the best material in the set and they used to reset on
+     every one of nine pages, so reading them meant finding and pressing a button
+     again on each. The choice now survives navigation within a session.
+     sessionStorage rather than localStorage: it is a reading preference for one
+     visit, not a setting. Every access is wrapped, because a private window or
+     blocked site data makes these throw, and the page has to be correct when it
+     does: the fallback is off, which is the first-visit default anyway. */
+  var THINK = 'ws-thinking';
+  function thinkGet() { try { return sessionStorage.getItem(THINK) === 'on'; } catch (e) { return false; } }
+  function thinkSet(v) { try { sessionStorage.setItem(THINK, v ? 'on' : 'off'); } catch (e) {} }
+
   function thinking() {
     var b = $('.w-tt');
     if (!b) return;
+    function apply(on, save) {
+      b.setAttribute('aria-pressed', String(on));
+      document.body.setAttribute('data-thinking', on ? 'on' : 'off');
+      $('.w-tt__l', b).textContent = on ? 'Hide our thinking' : 'Show our thinking';
+      if (save) thinkSet(on);
+    }
+    if (thinkGet()) apply(true, false);
     b.addEventListener('click', function () {
-      var on = b.getAttribute('aria-pressed') === 'true';
-      b.setAttribute('aria-pressed', String(!on));
-      document.body.setAttribute('data-thinking', on ? 'off' : 'on');
-      $('.w-tt__l', b).textContent = on ? 'Show our thinking' : 'Hide our thinking';
+      apply(b.getAttribute('aria-pressed') !== 'true', true);
     });
   }
 
   /* ---- Journey pill, only when arrived via ?journey=1 --------------- */
-  function journey() {
-    var pill = $('.w-journey');
-    if (!pill) return;
-    if (new URLSearchParams(location.search).get('journey') !== '1') return;
-    pill.setAttribute('data-on', '1');
-    $$('a[href]').forEach(function (a) {
-      var h = a.getAttribute('href');
-      if (!h || /^(https?:|mailto:|tel:|#)/.test(h)) return;
-      a.setAttribute('href', h + (h.indexOf('?') > -1 ? '&' : '?') + 'journey=1');
-    });
-  }
-
   /* ---- UK and AU switcher. Text, href, label and offices all move --- */
   function region() {
     var btn = $('[data-region-toggle]');
@@ -529,7 +532,7 @@
        every behaviour below it and the page still rendered, which is the hardest
        kind of failure to notice. */
     [sectionIndex, header, progress, magnetic, counters, curtain,
-     accordion, tabs, video, search, thinking, journey, region,
+     accordion, tabs, video, search, thinking, region,
      disclosure, forms].forEach(function (fn) {
       try { fn(); } catch (e) { if (window.console) console.error(fn.name || 'beat', e); }
     });

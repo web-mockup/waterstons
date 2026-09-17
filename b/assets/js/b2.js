@@ -696,14 +696,27 @@
 
 
   /* Show our thinking: our commentary on the client's page, off by default. */
+  /* Same as the other two options: the annotation choice survives navigation
+     within a session, so an evaluator turns it on once rather than on each of
+     nine pages. sessionStorage, every access wrapped, fallback off, because a
+     private window or blocked site data makes these throw and off is the
+     first-visit default anyway. */
+  var THINK = 'ws-thinking';
+  function thinkGet() { try { return sessionStorage.getItem(THINK) === 'on'; } catch (e) { return false; } }
+  function thinkSet(v) { try { sessionStorage.setItem(THINK, v ? 'on' : 'off'); } catch (e) {} }
+
   function thinking() {
     var b = $('.t-tt');
     if (!b) return;
+    function apply(on, save) {
+      b.setAttribute('aria-pressed', String(on));
+      document.body.setAttribute('data-thinking', on ? 'on' : 'off');
+      $('.t-tt__l', b).textContent = on ? 'Hide our thinking' : 'Show our thinking';
+      if (save) thinkSet(on);
+    }
+    if (thinkGet()) apply(true, false);
     b.addEventListener('click', function () {
-      var on = b.getAttribute('aria-pressed') === 'true';
-      b.setAttribute('aria-pressed', String(!on));
-      document.body.setAttribute('data-thinking', on ? 'off' : 'on');
-      $('.t-tt__l', b).textContent = on ? 'Show our thinking' : 'Hide our thinking';
+      apply(b.getAttribute('aria-pressed') !== 'true', true);
     });
   }
 
