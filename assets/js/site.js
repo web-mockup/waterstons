@@ -429,6 +429,47 @@
   function thinkGet() { try { return sessionStorage.getItem(THINK) === 'on'; } catch (e) { return false; } }
   function thinkSet(v) { try { sessionStorage.setItem(THINK, v ? 'on' : 'off'); } catch (e) {} }
 
+  /* Nav dropdowns. The panels work on hover and focus-within from CSS alone, so
+     this only takes over to add an explicit toggle, which is what a touch user
+     needs. data-drop-js tells the stylesheet to stand down; if this never runs,
+     the CSS behaviour stays and the nav item is still a working link either way. */
+  function drops() {
+    var btns = $$('[data-drop]');
+    if (!btns.length) return;
+    document.documentElement.setAttribute('data-drop-js', '');
+    var open = null;
+    function shut(b) {
+      if (!b) return;
+      b.setAttribute('aria-expanded', 'false');
+      var panel = document.getElementById(b.getAttribute('aria-controls'));
+      if (panel) panel.hidden = true;
+      if (open === b) open = null;
+    }
+    btns.forEach(function (b) {
+      var panel = document.getElementById(b.getAttribute('aria-controls'));
+      if (!panel) return;
+      panel.hidden = true;
+      b.addEventListener('click', function () {
+        var on = b.getAttribute('aria-expanded') === 'true';
+        if (open && open !== b) shut(open);
+        b.setAttribute('aria-expanded', String(!on));
+        panel.hidden = on;
+        open = on ? null : b;
+      });
+    });
+    /* Escape closes and returns focus to the control that opened it, and a
+       click or a tab outside closes without stealing focus. */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && open) { var b = open; shut(b); b.focus(); }
+    });
+    document.addEventListener('click', function (e) {
+      if (open && !open.parentNode.contains(e.target)) shut(open);
+    });
+    document.addEventListener('focusin', function (e) {
+      if (open && !open.parentNode.contains(e.target)) shut(open);
+    });
+  }
+
   function thinking() {
     var b = $('.w-tt');
     if (!b) return;
@@ -531,7 +572,7 @@
     /* Each beat isolated. This was a flat list, so one throw silently deleted
        every behaviour below it and the page still rendered, which is the hardest
        kind of failure to notice. */
-    [sectionIndex, header, progress, magnetic, counters, curtain,
+    [drops, sectionIndex, header, progress, magnetic, counters, curtain,
      accordion, tabs, video, search, thinking, region,
      disclosure, forms].forEach(function (fn) {
       try { fn(); } catch (e) { if (window.console) console.error(fn.name || 'beat', e); }

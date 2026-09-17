@@ -114,6 +114,36 @@ h3{font-size:clamp(1.15rem,1.6vw,1.4rem);line-height:1.2;letter-spacing:-.018em}
 .w-nav__link{position:relative;font-size:15px;font-weight:500;text-decoration:none;
   padding:.35rem 0;white-space:nowrap;color:var(--ink-mute);transition:color .3s var(--ease)}
 .w-nav__link:hover,.w-nav__link[aria-current="page"]{color:var(--ink)}
+
+/* ---- Nav dropdowns ----
+   The nav item stays a real link, so it works with no JavaScript and goes
+   somewhere useful on its own. The chevron beside it is a separate disclosure
+   button that opens the panel, which keeps one control doing one job and means
+   a touch user is never forced to guess whether tapping navigates or opens.
+   The panel also opens on hover and on focus-within, so pointer and keyboard
+   both reach it before any script has run. */
+.w-has{position:relative;display:flex;align-items:center;gap:2px}
+.w-nav__b{display:inline-flex;align-items:center;justify-content:center;
+  min-width:24px;min-height:24px;padding:0;border:0;background:none;cursor:pointer;
+  color:var(--ink-mute);border-radius:6px;transition:color .2s var(--ease),transform .25s var(--ease)}
+.w-nav__b:hover{color:var(--ink)}
+.w-nav__b[aria-expanded="true"]{color:var(--ink);transform:rotate(180deg)}
+.w-drop{position:absolute;top:calc(100% + 14px);left:-18px;z-index:120;
+  min-width:392px;max-width:min(92vw,470px);padding:10px;
+  background:#fff;border:1px solid var(--rule);border-radius:16px;
+  box-shadow:0 26px 60px rgba(15,31,52,.16)}
+.w-drop[hidden]{display:none}
+.w-drop__in{display:grid;gap:2px}
+.w-drop__a{display:grid;gap:3px;padding:11px 13px;border-radius:11px;text-decoration:none;
+  min-height:24px;transition:background-color .18s var(--ease)}
+.w-drop__a:hover,.w-drop__a:focus-visible{background:var(--wash,#f3f5f7)}
+.w-drop__t{font-weight:600;font-size:15px;color:var(--ink)}
+.w-drop__d{font-size:13px;line-height:1.45;color:var(--ink-mute)}
+/* Before the script runs, and for anyone it never runs for, hover and keyboard
+   focus still open it. [hidden] is removed by the script once it takes over. */
+html:not([data-drop-js]) .w-has:hover .w-drop,
+html:not([data-drop-js]) .w-has:focus-within .w-drop{display:block}
+@media (prefers-reduced-motion:reduce){.w-nav__b{transition:none}}
 .w-header__tools{display:flex;align-items:center;gap:.4rem;flex:none}
 .w-icon{display:inline-flex;align-items:center;justify-content:center;gap:.3rem;
   min-width:44px;min-height:44px;padding:0 .6rem;border-radius:999px;cursor:pointer;
