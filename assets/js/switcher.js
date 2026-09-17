@@ -65,10 +65,11 @@
 
   OPTIONS.forEach(function (o) {
     var to = base + o.seg + rest, label = o.label;
-    /* Option A is the base: it is the complete site and every page in B or C
-       is a redesign of a page that exists in it, so it needs no list. If that
-       ever stops being true it needs one too. */
-    var list = o.key === 'a' ? null : built(o.key);
+    /* Option A used to be exempt, because it was the complete site and every B
+       or C page was a redesign of a page it already had. Option B's Energy
+       sector page ended that, so A declares what it has like the others. The
+       exemption was the one place the permissive default still lived. */
+    var list = built(o.key);
     if (list && list.indexOf(rest) === -1) {
       to = base + o.seg + '/site/index.html';
       label += ' (homepage)';

@@ -100,6 +100,26 @@ These are design behaviours, not factual claims, and each is labelled in the int
   about 200 words per minute.
 - Launcher step card thumbnails are screenshots of these mockup pages, not Waterstons assets.
 
+### Energy sector page
+
+Added when the Sector page was built, to evidence Section 8's request for templates that can be replicated. Everything on that page is from this one source.
+
+| Used on | What | Source |
+|---|---|---|
+| Sector page hero | Energy is "an industry like no other"; safety critical environment, national infrastructure, the shift towards renewables; "truly trust the resilience of your technology infrastructure" | `/sectors/it-services-energy-sector` |
+| Sector page | "almost three decades" taking accountability and taking away pressure for the industry's most integral organisations | `/sectors/it-services-energy-sector` |
+| Sector page | "End-to-end energy expertise"; meeting regulatory compliance and driving higher standards in systems, safety and resilience; "work more smartly, more securely, and more safely" | `/sectors/it-services-energy-sector` |
+| Sector page | Four service families offered to the sector: Technology, Data and AI, Cyber Security, Business Consulting | `/sectors/it-services-energy-sector` |
+| Sector page | Dan Bloor quote, "Working in partnership with Waterstons, the Nutanix solution implemented gives Enva the benefit of greatly reduced risk, better recoverability, and greater scalability and flexibility as we continue to grow." Head of IT Service Delivery, Enva | `/sectors/it-services-energy-sector` |
+| Sector page | Four Energy case studies and the service each is labelled with: Building a resilient platform for growth (Technology Consulting, Enva); Lean and mean risk and incident management (Bespoke Software); Delivering project management as a service (Project Management, VARO); Implementing processes that deliver results (Managed Services, Enva) | `/sectors/it-services-energy-sector` |
+| Sector page | Enva and VARO named as Energy sector clients | `/sectors/it-services-energy-sector` |
+| Sector page | Articles: "CAF 4.0 Summer 2025 release - what's new?" (Aug 2025, Max Muir); "Demystifying the Cyber Assessment Framework (CAF)" (Apr 2025). NCSC reviews the CAF every 12 to 24 months; version 4.0 released 6 August 2025 | `/sectors/it-services-energy-sector` |
+| Sector page, all pages | "Ready to reimagine your business? We're with you."; office +44 345 094 0945, service desk +44 345 094 0944, info@waterstons.com | `/sectors/it-services-energy-sector` |
+
+**Not used:** the live Energy page leads on a stock photograph of a model in hi-vis holding a
+tablet. Section 7 of the brief asks for "Photography of real employees (not stock or AI)", so it
+was deliberately left out and the page carries their own documentary library instead.
+
 ## Confidentiality
 
 A few facts came from the client directly rather than from a public page. Those rows are
