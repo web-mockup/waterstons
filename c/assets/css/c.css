@@ -1,0 +1,455 @@
+/* ============================================================
+   Waterstons concept, Option C. "The scroll is the argument."
+
+   The same verified material as A and B, delivered as one continuous
+   scroll narrative in acts that pin, say one thing at full scale, and
+   release. Deliberately the ceiling rather than the recommendation.
+
+     ground   #152943 navy, white acts used as relief
+     accent   #78fa93, from the brand, never invented
+     display  300 to 500, set very large
+     frame    1280px
+
+   THE ONE RULE THIS FILE IS BUILT AROUND
+   Everything here rests in its finished state. Pinning, travel, parallax
+   and staging are all switched on by [data-motion], which only the script
+   sets and only after it has proved it can run. So the stylesheet on its
+   own is the reduced motion design: a stacked, scannable, materially
+   shorter page. A script that never loads leaves a complete page, and a
+   script that dies part way leaves one too.
+   ============================================================ */
+
+/* ---------- Fonts. Same faces as A and B, same metric matched fallbacks ---------- */
+@font-face{font-family:"Newsreader";src:url("../../../assets/fonts/newsreader-var.woff2") format("woff2");
+  font-weight:300 400;font-style:normal;font-display:swap}
+@font-face{font-family:"Poppins";src:url("../../../assets/fonts/poppins-400.woff2") format("woff2");
+  font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Poppins";src:url("../../../assets/fonts/poppins-500.woff2") format("woff2");
+  font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Poppins";src:url("../../../assets/fonts/poppins-600.woff2") format("woff2");
+  font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:"Newsreader Fallback";src:local("Georgia"),local("Times New Roman");
+  size-adjust:96.95%;ascent-override:75.81%;descent-override:27.33%;line-gap-override:0%}
+@font-face{font-family:"Poppins Fallback";src:local("Arial"),local("Helvetica Neue"),local("Helvetica");
+  size-adjust:105.6%;ascent-override:99.4%;descent-override:33.1%;line-gap-override:9.5%}
+
+:root{
+  --navy:#152943;
+  --navy-2:#0e1e33;         /* one step down, for panel separation */
+  --ground:#ffffff;
+  --ink:#152943;
+  --ink-2:#55616f;          /* 6.31 on white */
+  --ink-3:#66717f;          /* 4.96 on white */
+  --on-navy:#ffffff;
+  --on-navy-2:#a3adb8;      /* 6.45 on navy */
+  --rule:rgba(21,41,67,.13);
+  --rule-navy:rgba(255,255,255,.16);
+  --green:#78fa93;          /* 12.4 on navy. Never used behind dark text */
+
+  --serif:"le-monde-livre-std","Newsreader","Newsreader Fallback",Georgia,serif;
+  --sans:"urbane","Poppins","Poppins Fallback",system-ui,-apple-system,sans-serif;
+
+  --frame:1280px;
+  --edge:clamp(20px,4.4vw,64px);
+  --gap:clamp(20px,3vw,44px);
+
+  --ease:cubic-bezier(.4,0,.2,1);
+  --ease-out:cubic-bezier(.19,1,.22,1);
+
+  /* One viewport unit used everywhere a pinned act measures itself, so the
+     script and the stylesheet cannot disagree about what a screen is. svh
+     where supported, because a mobile URL bar collapsing mid travel would
+     otherwise resize the track under the reader. */
+  --vh:100vh;
+}
+@supports (height:100svh){:root{--vh:100svh}}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--navy);color:var(--on-navy);
+  font-family:var(--sans);font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+img{height:auto}                 /* B's image bug, fixed by construction here */
+a{color:inherit}
+h1,h2,h3,p,ul,ol,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+
+/* font-weight:inherit because the visually hidden headings are h2, and an h2
+   defaults to 700. Nothing here declares a 700 face, so a clipped, invisible
+   element was the only thing on either page asking the browser for one. */
+.c-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0;font-weight:inherit}
+.c-skip{position:absolute;left:-9999px;top:0;z-index:400;background:var(--green);color:var(--ink);
+  padding:14px 20px;font-weight:600;border-radius:0 0 6px 0}
+.c-skip:focus{left:0}
+
+/* Focus. One ring, always two toned so it holds on navy and on white alike. */
+:focus-visible{outline:3px solid var(--green);outline-offset:3px;border-radius:2px}
+.c-on-light :focus-visible{outline-color:var(--ink)}
+
+.c-frame{max-width:var(--frame);margin:0 auto;padding-inline:var(--edge);width:100%}
+
+/* ---------- Type ---------- */
+.c-d0{font-family:var(--serif);font-weight:300;line-height:.94;letter-spacing:-.02em;
+  font-size:clamp(46px,10.2vw,140px)}
+.c-d1{font-family:var(--serif);font-weight:300;line-height:1.02;letter-spacing:-.018em;
+  font-size:clamp(34px,6.4vw,84px)}
+.c-d2{font-family:var(--serif);font-weight:300;line-height:1.12;letter-spacing:-.012em;
+  font-size:clamp(26px,3.6vw,48px)}
+.c-lab{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--on-navy-2)}
+.c-on-light .c-lab{color:var(--ink-3)}
+.c-body{font-size:clamp(16px,1.35vw,19px);line-height:1.62;color:var(--on-navy-2);max-width:62ch}
+.c-on-light .c-body{color:var(--ink-2)}
+
+/* ---------- Acts ---------- */
+.c-act{position:relative;padding-block:clamp(72px,11vw,150px)}
+.c-act--light{background:var(--ground);color:var(--ink)}
+
+/* ============================================================
+   THE PINNED ACT
+   A sticky viewport inside a tall section. Vertical scroll inside that
+   section is read as a position and written to the track as a transform.
+   Native scroll throughout: nothing calls preventDefault, nothing owns
+   the wheel, nothing replaces the scrollbar.
+   ============================================================ */
+
+/* Resting state, which is also the reduced motion design and the no-script
+   page: no pinning, no travel, panels stacked and read top to bottom. */
+.c-pin{position:relative;background:var(--navy)}
+.c-pin__vp{position:static;overflow:visible}
+.c-pin__track{display:grid;gap:1px;background:var(--rule-navy)}
+.c-panel{background:var(--navy);padding-block:clamp(30px,3.6vw,48px);
+  display:flex;align-items:center}
+.c-panel__in{width:100%}
+/* Display size is a property of the act, so one token moves both states.
+   At rest the panels are a compact stacked sequence a reader scans; pinned,
+   each one is the only thing on the screen and is set to match. */
+.c-pin{--case:clamp(23px,2.8vw,34px)}
+[data-motion] .c-pin{--case:clamp(34px,6.4vw,84px)}
+.c-case__t{font-size:var(--case)}
+
+/* Switched on only once the script has proved it can run. --panels is written
+   by the builder, so the section is the right height before any script runs
+   and the pin cannot cause layout shift when it engages. */
+[data-motion] .c-pin{height:calc(var(--panels,3) * var(--vh))}
+[data-motion] .c-pin__vp{position:sticky;top:0;height:var(--vh);overflow:hidden}
+[data-motion] .c-pin__track{display:flex;height:100%;gap:0;background:none;
+  will-change:transform}
+[data-motion] .c-panel{flex:0 0 100vw;width:100vw;height:100%;padding-block:0;
+  border-left:1px solid var(--rule-navy)}
+[data-motion] .c-panel:first-child{border-left:0}
+
+/* The travel readout. A pinned act with no visible progress is a reader
+   wondering whether the page has frozen, which is the single commonest
+   complaint about this pattern. */
+.c-pin__bar{display:none}
+[data-motion] .c-pin__bar{display:block;position:absolute;bottom:clamp(24px,4vh,48px);
+  left:50%;transform:translateX(-50%);width:min(var(--frame),100% - var(--edge) * 2);
+  height:2px;background:var(--rule-navy)}
+[data-motion] .c-pin__bar > i{display:block;height:100%;background:var(--green);
+  transform:scaleX(var(--p,0));transform-origin:0 50%}
+
+/* ---------- The case study panels ---------- */
+.c-case__step{display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(14px,2vw,30px)}
+.c-case__n{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.6px;
+  color:var(--green)}
+.c-case__t{max-width:20ch}
+.c-case__b{margin-top:clamp(18px,2.4vw,30px)}
+
+/* The figure and its qualifier. They are one block and one reveal: the
+   qualifier is not a footnote to the number, it is part of the sentence the
+   number is making. "Circa 4%, reported following initial pilot rollout" is
+   the claim. "4%" on its own is a different claim, and an untrue one.
+
+   The two sizes are ONE declaration, not two that happen to look right. The
+   first version of this rule set them as independent clamps and asserted in a
+   comment that the ratio held; measured, it was 25% against a 40% floor. So
+   the ratio is now arithmetic the browser does:
+
+     qualifier = max(19px, figure x 0.44)
+
+   The figure floors at 44px, so 19px is never less than 43.2% of it, and the
+   qualifier is never below 19px, which is above the 17px body at every width.
+   Both halves of the criterion hold at every viewport by construction rather
+   than at 1440 by luck. Still measured at the gate. */
+.c-fig{display:block;--fig:clamp(44px,6vw,86px)}
+[data-motion] .c-fig{--fig:clamp(52px,7vw,104px)}
+.c-fig__n{display:block;font-family:var(--serif);font-weight:300;line-height:1;
+  letter-spacing:-.02em;font-size:var(--fig);color:var(--green)}
+.c-fig__q{display:block;margin-top:16px;font-family:var(--sans);font-weight:400;
+  font-size:max(19px, calc(var(--fig) * .44));line-height:1.36;
+  color:var(--on-navy);max-width:26ch}
+
+/* ---------- Motion primitives ----------
+   Every one of these rests finished and is inverted only under [data-motion].
+   Nothing moves on opacity, so no text is ever mid fade and below contrast. */
+.c-in{transform:none}
+[data-motion] .c-in{transform:translate3d(0,22px,0);
+  transition:transform .85s var(--ease-out)}
+[data-motion] .c-in.is-on{transform:none}
+
+.c-mask{display:inline-block;overflow:hidden;vertical-align:top;
+  padding-bottom:.1em;margin-bottom:-.1em}
+.c-mask > i{display:inline-block;font-style:inherit;transform:none}
+[data-motion] .c-mask > i{transform:translate3d(0,102%,0);
+  transition:transform .95s var(--ease-out)}
+[data-motion] .c-mask.is-on > i{transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;transition-duration:.001ms !important}
+  .c-in,.c-mask > i{transform:none !important}
+}
+
+/* ============================================================
+   CHROME AND ACTS
+   ============================================================ */
+
+/* ---------- Header. Static, so it never takes the top of a pinned act ----- */
+.c-head{position:relative;z-index:60;padding-block:clamp(18px,2.4vw,28px)}
+.c-head__in{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.c-logo img{width:clamp(132px,15vw,176px);height:auto}
+.c-btn{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:11px 20px;
+  border-radius:100px;background:var(--green);color:var(--ink);
+  font-size:14px;font-weight:600;text-decoration:none;
+  transition:transform .35s var(--ease)}
+.c-btn:hover{transform:translateY(-2px)}
+.c-on-light .c-btn{background:var(--ink);color:var(--ground)}
+
+/* ---------- C1. Open ----------------------------------------------------- */
+.c-open{min-height:calc(var(--vh) - 120px);display:flex;flex-direction:column;
+  justify-content:center;overflow:hidden;padding-block:clamp(48px,8vw,110px)}
+.c-open__in{position:relative;z-index:2}
+.c-open__p{margin-top:clamp(28px,4vw,48px);max-width:50ch;font-size:clamp(16px,1.5vw,20px);
+  line-height:1.55;color:var(--on-navy-2)}
+.c-open__p b{color:var(--on-navy);font-weight:600}
+.c-open__cue{position:relative;z-index:2;margin-top:clamp(36px,5vw,64px);
+  max-width:var(--frame);margin-inline:auto;width:100%;padding-inline:var(--edge);
+  font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--on-navy-2)}
+
+/* The mark at viewport scale behind the type, cropped by the act. Decorative,
+   aria-hidden, and an abstraction of the device rather than the lockup: a mark
+   presented incomplete is not a thing to do to a client's trademark. */
+/* Lower right, below the headline's last line and clear of the standfirst,
+   which is capped at 50ch. Centring it vertically put arc strokes through the
+   middle of the opening headline. I looked at that in a screenshot and decided
+   it read as a watermark; the differential check disagreed and the check is
+   right, because a 1px stroke through the counter of a letterform is damage at
+   any opacity. */
+.c-arcs{position:absolute;right:-13%;top:auto;bottom:-20%;
+  width:min(42vw,480px);height:auto;z-index:1;pointer-events:none}
+.c-arcs path{fill:none;stroke:var(--green);stroke-width:1.25;opacity:.2}
+/* Same rule as the other two acts that draw this geometry: below 900px there
+   is no column to reserve for it, so it goes rather than crossing the type.
+   The earlier version merely moved and faded it, which put arc strokes through
+   the opening headline at phone widths. */
+@media (max-width:900px){.c-arcs{display:none}}
+
+/* ---------- C2b. Four peers, four rows ----------------------------------- */
+.c-list{border-top:1px solid var(--rule)}
+.c-item{border-bottom:1px solid var(--rule)}
+.c-item__a{display:grid;grid-template-columns:1fr auto;gap:8px 20px;align-items:baseline;
+  padding-block:clamp(22px,3vw,36px);text-decoration:none;color:inherit;
+  transition:transform .4s var(--ease)}
+.c-item__a:hover{transform:translateX(10px)}
+.c-item__d{grid-column:1/-1;color:var(--ink-2);max-width:56ch;
+  font-size:clamp(15px,1.25vw,17px)}
+.c-item__x{color:var(--ink-3);transition:transform .4s var(--ease)}
+.c-item__a:hover .c-item__x{transform:translateX(6px)}
+@media (prefers-reduced-motion:reduce){
+  .c-item__a:hover,.c-item__a:hover .c-item__x,.c-btn:hover{transform:none}
+}
+
+/* ---------- Foot --------------------------------------------------------- */
+.c-foot{padding-block:clamp(48px,7vw,88px);border-top:1px solid var(--rule-navy)}
+.c-foot .c-body{margin-top:12px}
+.c-foot a{color:var(--on-navy)}
+
+/* ============================================================
+   C3. MEASURED. Pinned background, content scrolling over it.
+   A different mechanic from C2 on purpose: the background is pinned and
+   scrubbed while the figures scroll past at the reader's own pace. Nothing
+   is traversed, so nobody is held up by it, which is what lets a second
+   pinned act exist on the same page without becoming an obstacle course.
+   ============================================================ */
+.c-scrub{position:relative;background:var(--navy);overflow:clip;
+  padding-block:clamp(72px,11vw,150px)}
+.c-scrub__bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+[data-motion] .c-scrub__bg{position:sticky;top:0;height:var(--vh);
+  margin-bottom:calc(-1 * var(--vh));inset:auto}
+.c-scrub__in{position:relative;z-index:1}
+
+/* The arcs, drawn by scroll position. stroke-dashoffset is set from --s by the
+   script; at rest --s is 1, so the geometry is complete and the act looks
+   finished rather than blank when nothing runs.
+
+   The device is given the right hand third and the text keeps the left, because
+   the first build of this act drew arc strokes straight through the middle of
+   every figure and label. Option B learned the same lesson once already. Ink
+   over letterforms is not a background, it is damage, and no amount of low
+   opacity fixes a 1px stroke through the counter of an O. */
+.c-scrub__bg svg{position:absolute;left:auto;right:-13%;top:50%;
+  width:min(74vw,860px);height:auto;transform:translateY(-50%)}
+.c-scrub__bg path{fill:none;stroke:var(--green);stroke-width:1;opacity:.24;
+  stroke-dasharray:var(--len,2000);
+  stroke-dashoffset:calc(var(--len,2000) * (1 - var(--s,1)))}
+@media (max-width:900px){
+  /* No room for a reserved column, so the device goes rather than overlaps. */
+  .c-scrub__bg{display:none}
+  [data-motion] .c-scrub__bg{display:none}
+}
+
+.c-figs{display:grid;gap:clamp(30px,4.6vw,58px);margin-top:clamp(34px,5vw,64px)}
+@media (min-width:901px){.c-figs,.c-quote,.c-scrub .c-lab{max-width:56%}}
+.c-figr__n{display:block;font-family:var(--serif);font-weight:300;line-height:1;
+  letter-spacing:-.02em;font-size:clamp(38px,5.4vw,72px);color:var(--green)}
+.c-figr__l{display:block;margin-top:14px;font-size:clamp(15px,1.3vw,18px);line-height:1.5;
+  color:var(--on-navy-2);max-width:30ch}
+
+.c-quote{margin-top:clamp(52px,7vw,96px);max-width:30ch}
+.c-quote__t{font-family:var(--serif);font-weight:300;line-height:1.16;
+  letter-spacing:-.012em;font-size:clamp(24px,3.4vw,46px)}
+.c-quote__c{margin-top:22px;font-size:15px;color:var(--on-navy-2)}
+.c-quote__c b{display:block;color:var(--on-navy);font-weight:600}
+
+/* ============================================================
+   C4. THE AMBIENT LOOP
+   The one beat that never arrives and never finishes. Everything else on
+   this page is triggered by the reader; this runs regardless, so the page
+   is never completely still.
+
+   It also carries a pause control, and that is not optional. WCAG 2.2.2
+   requires a mechanism to pause, stop or hide anything that moves
+   automatically for more than five seconds, and "never stops" was the
+   plan's own wording. Motion sensitivity is not only prefers-reduced-motion:
+   plenty of people who need this off have never set that flag. The control
+   is a real button, in the tab order, not a hover trick.
+   ============================================================ */
+.c-marq{position:relative;overflow:hidden;padding-block:clamp(40px,6vw,76px);
+  border-block:1px solid var(--rule-navy)}
+.c-marq__t{display:flex;width:max-content;gap:clamp(40px,6vw,88px);align-items:center}
+[data-motion] .c-marq__t{animation:c-slide 40s linear infinite}
+[data-motion] .c-marq[data-paused] .c-marq__t{animation-play-state:paused}
+@keyframes c-slide{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+.c-marq img{height:clamp(30px,3.4vw,44px);width:auto;
+  /* Client marks are trademarks and stay exactly as issued: not recoloured,
+     not knocked out, not tinted to match the page. They sit on a white plate
+     instead, which is the only honest way to put them on a navy ground. */
+  background:#fff;padding:12px 18px;border-radius:4px}
+.c-marq__p{position:absolute;right:var(--edge);bottom:12px;z-index:2;
+  display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 16px;
+  border-radius:100px;border:1px solid var(--rule-navy);background:var(--navy);
+  color:var(--on-navy);font:inherit;font-size:12px;letter-spacing:.4px;cursor:pointer}
+.c-marq__p:hover{border-color:var(--on-navy-2)}
+@media (prefers-reduced-motion:reduce){
+  .c-marq__t{animation:none !important}
+  /* With the loop inert the rail has to become something else, and the first
+     attempt made it a horizontal scroller. axe caught that immediately: a
+     scrollable region with nothing focusable inside it cannot be scrolled by
+     a keyboard at all, so the marks became unreachable for exactly the people
+     this branch exists to serve.
+
+     Wrapping is better than fixing that with a tab stop. The marks lay out on
+     as many lines as they need, nothing scrolls, nothing needs keyboard access
+     it does not already have, and the whole set is visible at once, which is
+     what the reduced design is supposed to be: more scannable, not less. */
+  .c-marq{overflow:visible}
+  .c-marq__t{flex-wrap:wrap;width:auto;row-gap:clamp(18px,2.4vw,30px)}
+  .c-marq__dup{display:none}     /* the seamless-loop copy, not wanted at rest */
+  .c-marq__p{display:none}
+}
+
+/* ============================================================
+   C5. SECTORS. A heading that stays while its list passes it.
+   Sticky, vertical, no traversal: a reader scrolls at their own speed and
+   nothing is withheld.
+   ============================================================ */
+.c-sect{position:relative;background:var(--ground);color:var(--ink);
+  padding-block:clamp(72px,11vw,150px)}
+.c-sect__g{display:grid;gap:clamp(28px,4vw,56px)}
+@media (min-width:900px){.c-sect__g{grid-template-columns:minmax(0,34%) minmax(0,1fr);
+  gap:clamp(32px,5vw,72px)}}
+.c-sect__h{align-self:start}
+@media (min-width:900px){[data-motion] .c-sect__h{position:sticky;top:clamp(80px,18vh,180px)}}
+.c-sect__t{margin-top:16px}
+.c-sect__l{border-top:1px solid var(--rule)}
+.c-sect__i{border-bottom:1px solid var(--rule);padding-block:clamp(26px,3.4vw,44px)}
+.c-sect__n{font-family:var(--serif);font-weight:300;line-height:1.1;letter-spacing:-.012em;
+  font-size:clamp(25px,3.2vw,42px);display:block}
+.c-sect__d{display:block;margin-top:12px;color:var(--ink-2);max-width:52ch;
+  font-size:clamp(15px,1.25vw,17px)}
+
+/* ============================================================
+   C6. THE PEOPLE. Full bleed plates, slow counter-scroll.
+   The photography is the only thing on this page allowed to break the frame,
+   which is the same argument Option B makes: a documentary library of real
+   colleagues in real buildings is the one element a competitor cannot copy.
+   Every plate carries a caption, at every screen size, in the client's voice.
+   ============================================================ */
+.c-plate{position:relative;margin-block:clamp(52px,8vw,110px)}
+.c-plate__f{position:relative;overflow:hidden;height:clamp(300px,64vh,660px)}
+.c-plate__f img{width:100%;height:100%;object-fit:cover;object-position:center}
+[data-motion] .c-plate__f img{height:124%;top:-12%;position:absolute;left:0;
+  transform:translate3d(0,calc(var(--y,0) * 1px),0);will-change:transform}
+.c-plate__c{display:grid;gap:4px;margin-top:16px;max-width:var(--frame);
+  margin-inline:auto;padding-inline:var(--edge)}
+.c-plate__n{font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--on-navy)}
+.c-plate__d{font-size:14px;color:var(--on-navy-2)}
+@media (prefers-reduced-motion:reduce){
+  [data-motion] .c-plate__f img{position:static;height:100%;top:auto;transform:none}
+}
+
+/* ============================================================
+   C7. CLOSE. The device completes at viewport scale, once.
+   ============================================================ */
+/* One rule for all three acts that draw the geometry, C1, C3 and C7: the
+   reading column is on the left, the geometry is on the right, and below
+   900px the geometry is dropped rather than overlapped. Enforced by counting
+   painted pixels inside text boxes, not by eye. */
+.c-close{position:relative;overflow:hidden;min-height:clamp(560px,86vh,860px);
+  display:flex;align-items:center;padding-block:clamp(64px,9vw,120px)}
+.c-close__bg{position:absolute;inset:0;pointer-events:none}
+.c-close__bg svg{position:absolute;right:-8%;top:50%;transform:translateY(-50%);
+  width:min(62vw,720px);height:auto}
+.c-close__bg path{fill:none;stroke:var(--green);stroke-width:1.4;opacity:.3;
+  stroke-dasharray:var(--len,2000);
+  stroke-dashoffset:calc(var(--len,2000) * (1 - var(--s,1)))}
+/* The constraint belongs on the content, not on the frame. Putting max-width
+   on .c-close__in overrode .c-frame's own max-width and centring, so the text
+   block got WIDER at the right edge rather than narrower and ran straight back
+   under the geometry. C3 does the same job correctly by constraining the
+   children, which is why C3 was clean and this was not. */
+@media (min-width:901px){.c-close__body{max-width:56%}}
+@media (max-width:900px){.c-close__bg{display:none}}
+.c-close__in{position:relative;z-index:1;width:100%}
+/* auto-fit with a real minimum, not three forced columns.
+   repeat(3, minmax(0, 1fr)) lets a column shrink below its content, and once
+   .c-close__body narrowed this block to 56% of the frame the columns fell to
+   about 195px while "info@waterstons.com" needs roughly 200px at 21px. The
+   address then ran straight into the office list with no space between them:
+   "info@waterstons.comDurham, London,". It was clean at 1280 and broken at
+   1440 and 1024, which is what a collapsing gap looks like rather than one
+   wrong rule, so the fix is a floor rather than another breakpoint.
+   min(100%, 230px) keeps it valid when the container is narrower than 230px. */
+.c-close__c{display:grid;gap:clamp(20px,3vw,40px);margin-top:clamp(30px,4.4vw,56px);
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.c-close__c a{font-size:clamp(17px,1.6vw,21px);text-decoration:none;border-bottom:1px solid var(--rule-navy);padding-bottom:6px;display:inline-block}
+.c-close__c a:hover{border-bottom-color:var(--green)}
+
+/* ---------- The enquiry form. Concept only, submits nothing. ------------- */
+.c-form{margin-top:clamp(28px,4vw,44px);display:grid;gap:18px;max-width:640px}
+.c-cols{display:grid;gap:18px}
+@media (min-width:620px){.c-cols{grid-template-columns:1fr 1fr}}
+.c-field{display:grid;gap:7px}
+.c-field label{font-size:13px;letter-spacing:.3px;color:var(--on-navy-2)}
+.c-field input,.c-field textarea{font:inherit;font-size:16px;color:var(--on-navy);
+  background:transparent;border:1px solid var(--rule-navy);border-radius:4px;
+  padding:13px 14px;min-height:48px;width:100%}
+.c-field textarea{min-height:120px;resize:vertical}
+.c-field input:focus-visible,.c-field textarea:focus-visible{border-color:var(--green)}
+/* Honeypot. Off screen rather than display:none, so a bot fills it. */
+.c-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.c-note{font-size:13px;color:var(--on-navy-2);max-width:52ch}
+.c-form button{justify-self:start}
