@@ -304,9 +304,28 @@ b,strong{font-weight:600}
 /* ---------- The one navy band ---------- */
 .t-navy{background:var(--navy);color:var(--on-navy)}
 /* the arcs, first appearance: once, at scale, on navy, in green */
-.t-arcs{position:absolute;right:0;bottom:0;width:min(38vw,420px);opacity:.9;
+/* THE MARK COMPLETES WHOLE, OR IT DOES NOT COMPLETE.
+   It was 420px wide anchored to the section's bottom-right corner, which made
+   it 315px tall inside a 296px band: it began 19px above the section, ran up
+   through the hairline at the top and was cropped by the overflow. Two things
+   wrong with that. It crosses a rule, which looks like a mistake. And it shows
+   the client's mark incomplete, which is the one thing this build decided not
+   to do to it, the same reason the payoff draws the abstract device and never
+   the lockup.
+
+   Sized by HEIGHT now, so it always fits between the hairline and the foot of
+   the band whatever the band is doing, and the width follows the 4:3 of the
+   artwork. Right-aligned into the empty corner the content does not use. */
+.t-arcs{position:absolute;right:clamp(14px,2.6vw,56px);bottom:clamp(14px,2.2vw,34px);
+  height:clamp(70px,10.4vw,196px);width:auto;opacity:.9;
   pointer-events:none}
 .t-arcs path{fill:none;stroke:var(--green);stroke-width:1.5}
+/* The band's content keeps out of the corner the mark occupies. Reserving the
+   space is a guarantee; shrinking the mark until the two happen not to touch at
+   the widths I tested is a coincidence I would have to re-establish every time
+   a line of copy changes length. */
+.t-navy .t-col{padding-right:clamp(0px,17vw,300px)}
+@media (max-width:899px){.t-navy .t-col{padding-right:0}}
 
 /* ---------- Header ---------- */
 .t-head{position:sticky;top:0;z-index:100;background:var(--ground);
@@ -616,13 +635,14 @@ b,strong{font-weight:600}
 }
 
 /* The one signature moment: the arcs draw once, in the single dark band. */
+/* All three draw together and in about a second. They used to be staggered by
+   120ms each over 1.8s, which is the same staging that made the margin device
+   look like a slideshow: three things happening in sequence reads as a
+   mechanism, one thing happening reads as a mark being drawn. */
 .t-arcs path{stroke-dasharray:var(--len,900);stroke-dashoffset:0;
-  transition:stroke-dashoffset 1.8s var(--ease-out)}
+  transition:stroke-dashoffset 1.05s var(--ease-out)}
 [data-motion] .t-arcs path{stroke-dashoffset:var(--len,900)}
 [data-motion] .t-arcs.is-on path{stroke-dashoffset:0}
-.t-arcs.is-on path:nth-child(2){transition-delay:.12s}
-.t-arcs.is-on path:nth-child(3){transition-delay:.24s}
-.t-arcs.is-on path:nth-child(4){transition-delay:.36s}
 
 /* ---------- Motion: short, small, and nothing draws itself ---------- */
 /* Transform only. A fade fails contrast for the whole of its duration, and an
