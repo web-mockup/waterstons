@@ -415,8 +415,13 @@ Zero page errors in all four.
 ### Keyboard
 
 Measured the same way before and after, on the published pages and the new
-ones: 28 stops to 37 on the homepage, 36 to 44 on Cyber. Exactly nine and eight
-added, every one of them in the index, and nothing else moved. No stop is
+ones: **nine stops added on the homepage and eight on Cyber, every one of them
+in the index, and nothing outside the index moved.**
+
+The delta is quoted rather than a total because a total depends entirely on what
+is counted as a stop, so anyone tabbing through and counting will get their own
+number. The delta does not: whatever a reader counts before, they count exactly
+nine or eight more after, and the difference is the index. No stop is
 unnamed, none is under 24px, none lands on something a reader cannot see. The
 closest pair of points is 38px apart, against the 24px that WCAG 2.5.8 asks for.
 

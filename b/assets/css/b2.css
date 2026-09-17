@@ -515,11 +515,22 @@ b,strong{font-weight:600}
     /* 24px of hit area around a 7px dot, so the target clears 2.5.8 while the
        thing a reader sees stays the size the device can carry. */
     position:relative;display:grid;place-items:center;width:24px;height:24px;padding:0}
+  /* Every point is a live link to a real section, and its label is at opacity 0
+     until focus, so the dot is the sole visual identifier of the control for a
+     sighted reader. WCAG 1.4.11 therefore applies to it at 3:1, including the
+     sections nobody has reached yet, which are exactly what an index is for.
+     Ink on white reaches 3:1 at opacity 0.491, so the resting state was failing
+     at 0.34 and 2.05:1. 0.58 gives 3.85:1 with room for antialiasing.
+
+     The progress reading is carried by the arc, which is drawn behind the
+     points a reader has passed and absent ahead of them, so the dots no longer
+     have to do it with opacity they cannot afford. axe cannot see any of this:
+     its colour rule covers text, and the text here is not painted. */
   .t-watch[data-nav] .t-watch__l a::before{content:"";width:8px;height:8px;border-radius:50%;
-    background:var(--ink);opacity:.34;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+    background:var(--ink);opacity:.58;transition:opacity .3s var(--ease),transform .3s var(--ease)}
   .t-watch[data-nav] .t-watch__l a:hover::before,
   .t-watch[data-nav] .t-watch__l a:focus-visible::before{opacity:1;transform:scale(1.5)}
-  .t-watch[data-nav] .t-watch__l li[data-done] a::before{opacity:.72}
+  .t-watch[data-nav] .t-watch__l li[data-done] a::before{opacity:.82}
   .t-watch[data-nav] .t-watch__l li[data-here] a::before{opacity:1;transform:scale(1.85)}
   /* The label is the accessible name and the hover reveal, never the only
      signal: the current section is always named in .t-watch__n as plain text. */
