@@ -57,9 +57,35 @@
         n = n.parentElement;
       }
     });
-    /* nothing may stay faded because an observer never fired */
-    /* nothing may stay hidden because an observer never fired */
-    setTimeout(function () { $$(SEL).forEach(function (el) { el.classList.add('is-on'); }); }, 2500);
+    /* NOTHING MAY STAY HIDDEN BECAUSE AN OBSERVER NEVER FIRED, and nothing may
+       be spent before a reader reaches it.
+
+       This used to mark every element on the page after 2.5s. That keeps the
+       first half of the guarantee and destroys the page: two and a half seconds
+       after load every arrival had already happened, so scrolling down revealed
+       content that had finished animating while the reader was still at the
+       top. The page was not static, it had simply already played.
+
+       The guarantee is only ever about what a reader can SEE, so the fallback
+       reveals what is at or above the fold and then keeps doing that on scroll.
+       Nothing visible is ever hidden; nothing below the fold is spent early. */
+    var fallback = false;
+    function reachable() {
+      var pending = false;
+      $$(SEL).forEach(function (el) {
+        if (el.classList.contains('is-on')) return;
+        if (el.getBoundingClientRect().top < innerHeight) el.classList.add('is-on');
+        else pending = true;
+      });
+      return pending;
+    }
+    setTimeout(function () {
+      fallback = true;
+      reachable();
+      addEventListener('scroll', function () {
+        if (fallback && !reachable()) fallback = false;
+      }, { passive: true });
+    }, 2500);
   }
 
   /* The header gains a rule once the page has moved, and carries the name of
@@ -290,7 +316,8 @@
     var runs = [], base = Math.floor(n / 3), extra = n % 3;
     for (var i = 0; i < 3; i++) runs.push(base + (i < extra ? 1 : 0));
 
-    var paths = $$('path', el), count = $('.t-watch__n', el);
+    /* Only the live paths, never the ghost behind them. */
+    var paths = $$('svg > path', el), count = $('.t-watch__n', el);
     /* getTotalLength can throw on a hidden or detached SVG, and the fallback is
        a working device with a guessed dash length rather than a dead one. It is
        a handled case, so it warns once instead of rethrowing: silent would hide
@@ -318,7 +345,19 @@
          per section. It is not a percentage of scroll. What changes is that the
          mark now assembles as one thing, and the ink arrives at each point as
          the reader arrives at its section. */
-      var frac = full ? 1 : (n ? cur / n : 0);
+      /* Continuous, not nine steps. The step version was the honest reading of
+         "one advance per section" and it looks like a slideshow: nine jumps,
+         each eased, none of them tied to what the hand is doing. This follows
+         scroll position directly, so the mark is drawn BY the reader rather
+         than played at them. The points still mark sections, which is where
+         the discrete information belongs. */
+      var frac;
+      if (full) frac = 1;
+      else {
+        var doc = document.documentElement;
+        var max = doc.scrollHeight - innerHeight;
+        frac = max > 0 ? Math.min(1, Math.max(0, window.pageYOffset / max)) : 0;
+      }
       for (var i = 0; i < 3; i++) {
         var p = paths[i];
         if (!p) continue;
@@ -430,8 +469,19 @@
             var node = stack[k];
             if (node === el || el.contains(node)) continue;
             if (node === document.body || node === document.documentElement) continue;
-            if (node.children.length) continue;              /* only leaves carry text */
-            if ((node.textContent || '').trim()) return true;
+            /* A DIRECT text node, not "an element with no children".
+               The leaf test skipped anything containing an element, and the
+               section labels contain the mark svg, so the one thing this
+               device sits next to was the one thing it could not see. It
+               yielded once in thirteen scroll positions while overlapping
+               labels at every narrow width. Same mistake as measuring column
+               ink by element rather than by text node. */
+            var direct = false;
+            for (var t = 0; t < node.childNodes.length; t++) {
+              var cn = node.childNodes[t];
+              if (cn.nodeType === 3 && cn.nodeValue && cn.nodeValue.trim()) { direct = true; break; }
+            }
+            if (direct) return true;
           }
         }
       }
@@ -521,6 +571,42 @@
      hide anything. The flag goes on before the beats and comes straight back
      off if any of them throws, so a page that fails halfway is a page with
      everything visible rather than a text document with the photographs gone. */
+  /* The reel's buttons. It scrolls by drag and by keyboard already, but with
+     the scrollbar hidden there was no way to discover that with a mouse and no
+     sign there was anything past the right edge. The buttons are the
+     affordance; they move by one card and disable at each end so the control
+     tells you where you are. */
+  function reel() {
+    $$('.t-reel').forEach(function (rail) {
+      var nav = rail.parentElement && $('.t-reel__nav', rail.parentElement);
+      if (!nav) return;
+      var prev = $('[data-reel-prev]', nav), next = $('[data-reel-next]', nav);
+      if (!prev || !next) return;
+
+      function step() {
+        var first = rail.firstElementChild;
+        if (!first) return rail.clientWidth * 0.8;
+        var gap = parseFloat(getComputedStyle(rail).columnGap) || 0;
+        return first.getBoundingClientRect().width + gap;
+      }
+      function sync() {
+        var max = rail.scrollWidth - rail.clientWidth;
+        prev.disabled = rail.scrollLeft <= 2;
+        next.disabled = rail.scrollLeft >= max - 2;
+        nav.hidden = max <= 2;                 /* nothing to scroll, no control */
+      }
+      prev.addEventListener('click', function () {
+        rail.scrollBy({ left: -step(), behavior: reduced ? 'auto' : 'smooth' });
+      });
+      next.addEventListener('click', function () {
+        rail.scrollBy({ left: step(), behavior: reduced ? 'auto' : 'smooth' });
+      });
+      rail.addEventListener('scroll', sync, { passive: true });
+      addEventListener('resize', sync, { passive: true });
+      sync();
+    });
+  }
+
   function init() {
     var root = document.documentElement;
     try {
@@ -539,7 +625,7 @@
        reported, so a dead beat is never silent */
     [['head', head], ['watch', watch], ['index', index], ['region', region],
      ['accordion', accordion], ['video', video], ['forms', forms],
-     ['journey', journey]].forEach(function (pair) {
+     ['journey', journey], ['reel', reel]].forEach(function (pair) {
       try { pair[1](); } catch (e) { fail(pair[0], e); }
     });
     try {

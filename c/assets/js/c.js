@@ -190,6 +190,29 @@
       items.forEach(function (el) { el.classList.add('is-on'); });
     }
 
+    /* THE FAILSAFE MUST NOT REVEAL WHAT NOBODY HAS REACHED.
+       It used to mark every element on the page after 2.5s, which keeps the
+       guarantee that nothing stays hidden and destroys the entire point of the
+       page: after two and a half seconds every arrival had already happened, so
+       scrolling down showed finished content and nothing ever played. That is
+       what "the photographs are stale" means. They were not stale, they had
+       arrived while the reader was still at the top.
+
+       The guarantee is only about what a reader can SEE. So the fallback
+       reveals anything at or above the fold and then keeps doing that on
+       scroll: nothing visible is ever hidden, and nothing below the fold is
+       spent before it is reached. */
+    var fallback = false;
+    function reachable() {
+      var any = false;
+      items.forEach(function (el) {
+        if (el.classList.contains('is-on')) return;
+        if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('is-on');
+        else any = true;
+      });
+      return any;
+    }
+
     if (reduced || !('IntersectionObserver' in window)) { all(); return; }
 
     var io = new IntersectionObserver(function (es) {
@@ -223,7 +246,34 @@
       });
     });
 
-    setTimeout(all, 2500);
+    /* After 2.5s, stop trusting the observer and drive it from scroll instead,
+       but only ever for what is on screen. */
+    setTimeout(function () {
+      if (done) return;
+      fallback = true;
+      reachable();
+      addEventListener('scroll', function () {
+        if (!fallback) return;
+        if (!reachable()) fallback = false;
+      }, { passive: true });
+    }, 2500);
+
+    /* A plate that has finished arriving drops its transition, so the
+       counter-scroll follows the scroll rather than trailing 2.6s behind it. */
+    var plates = $$('.c-plate');
+    if (plates.length) {
+      var watchdog = setInterval(function () {
+        var left = 0;
+        plates.forEach(function (pl) {
+          if (!pl.classList.contains('is-on')) { left++; return; }
+          if (!pl.hasAttribute('data-settled')) {
+            setTimeout(function () { pl.setAttribute('data-settled', ''); }, 2700);
+            pl.setAttribute('data-pending', '');
+          }
+        });
+        if (!left) clearInterval(watchdog);
+      }, 400);
+    }
   }
 
   /* ---------- C4. The pause control ---------------------------------------
@@ -265,8 +315,12 @@
         if (!img) return;
         var r = f.getBoundingClientRect();
         if (r.bottom < -80 || r.top > window.innerHeight + 80) return;
+        /* -128px at the extremes rather than -46. The frame is oversized by
+           48% with a -24% offset, so 24% of the frame height is headroom on
+           each side and the travel can never expose an edge. At 660px that is
+           158px of room for 128px of movement. */
         var mid = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight;
-        img.style.setProperty('--y', (clamp(mid, -1, 1) * -46).toFixed(1));
+        img.style.setProperty('--y', (clamp(mid, -1, 1) * -128).toFixed(1));
       });
     }
     window.addEventListener('scroll', function () {

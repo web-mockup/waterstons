@@ -383,14 +383,38 @@ ul,ol{padding:0;list-style:none}
 .c-plate{position:relative;margin-block:clamp(52px,8vw,110px)}
 .c-plate__f{position:relative;overflow:hidden;height:clamp(300px,64vh,660px)}
 .c-plate__f img{width:100%;height:100%;object-fit:cover;object-position:center}
-[data-motion] .c-plate__f img{height:124%;top:-12%;position:absolute;left:0;
-  transform:translate3d(0,calc(var(--y,0) * 1px),0);will-change:transform}
+
+/* THE PLATES ARE THE LOUDEST THING ON THIS PAGE, OR THEY ARE POINTLESS.
+   The first build gave them a 22px rise and a parallax of plus or minus 40px
+   across the whole page, which measured as five distinct positions in
+   twenty-five samples: moving, by arithmetic, and completely still to look at.
+   On the option whose argument is excess, the photography was the quietest
+   thing on it.
+
+   Three beats now, and none of them touches opacity:
+   the frame wipes open from the foot, the image settles out of an overscale,
+   and it counter-scrolls far enough to see. The oversize is 148% with a -24%
+   offset, which is 24% of headroom each way, so the travel below can never
+   expose an edge. */
+.c-plate__f{clip-path:inset(0 0 0 0)}
+[data-motion] .c-plate__f{clip-path:inset(0 0 100% 0);
+  transition:clip-path 1.25s var(--ease-out)}
+[data-motion] .c-plate.is-on .c-plate__f{clip-path:inset(0 0 0 0)}
+[data-motion] .c-plate__f img{height:148%;top:-24%;position:absolute;left:0;
+  transform:translate3d(0,calc(var(--y,0) * 1px),0) scale(var(--s,1.09));
+  transition:transform 2.6s var(--ease-out);will-change:transform}
+[data-motion] .c-plate.is-on .c-plate__f img{--s:1}
+/* Once it has arrived the transition comes off, so the counter-scroll tracks
+   the scroll instead of easing a second and a half behind it. */
+[data-motion] .c-plate.is-on[data-settled] .c-plate__f img{transition:none}
 .c-plate__c{display:grid;gap:4px;margin-top:16px;max-width:var(--frame);
   margin-inline:auto;padding-inline:var(--edge)}
 .c-plate__n{font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--on-navy)}
 .c-plate__d{font-size:14px;color:var(--on-navy-2)}
 @media (prefers-reduced-motion:reduce){
-  [data-motion] .c-plate__f img{position:static;height:100%;top:auto;transform:none}
+  [data-motion] .c-plate__f{clip-path:none !important}
+  [data-motion] .c-plate__f img{position:static;height:100%;top:auto;
+    transform:none !important;transition:none}
 }
 
 /* ============================================================

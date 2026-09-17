@@ -48,15 +48,30 @@
   --sans:"urbane","Poppins","Poppins Fallback",system-ui,-apple-system,sans-serif;
 
   --frame:1280px;
+  /* The offset column is a fixed share of the frame, so on a wide screen the
+     page's own centring margins stack on top of it: at 1870px that was 295px
+     of margin plus a 392px empty column, nearly 700px before a word. The frame
+     grows on large displays so the emptiness stays a deliberate third of the
+     content rather than a third plus whatever the monitor adds. */
   --edge:clamp(20px,4.4vw,64px);
-  --col:34%;                /* the offset: content starts here */
+  /* The offset: content starts here. Capped in pixels as well as expressed as
+     a share, because a share of a wider frame is simply a wider empty column,
+     and growing the frame alone moved the start of the text from 40% of the
+     screen to exactly 40% of a bigger screen. The column has a job, holding a
+     12px label and a 148px device, and 320px does it at any width. */
+  --col:min(30%, 258px);
   --gap:clamp(20px,3vw,44px);
-  --band:clamp(52px,7.2vw,104px);
+  /* Section padding. Was clamp(52px,7.2vw,104px), which is up to 208px between
+     any two sections and left 36% of the page as gap, twelve of them over 60px
+     and the largest 246px. Air is the argument; that much of it is absence. */
+  --band:clamp(22px,2.4vw,40px);
 
   /* nothing slower than .8s */
   --ease:cubic-bezier(.4,0,.2,1);
   --ease-out:cubic-bezier(.19,1,.22,1);
 }
+@media (min-width:1600px){:root{--frame:1460px}}
+@media (min-width:1850px){:root{--frame:1600px}}
 
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
@@ -95,7 +110,7 @@ button{font:inherit}
 .t-sec--tight{padding-block:calc(var(--band) * .55)}
 /* The hero carries no label, so it is not an offset section: it runs from the
    frame edge like the wordmark above it, and it is compact rather than tall. */
-.t-hero{padding-block:clamp(60px,9vw,128px) clamp(44px,6vw,84px)}
+.t-hero{padding-block:clamp(34px,4.4vw,64px) clamp(28px,3.4vw,52px)}
 .t-hero .t-row{display:block}
 .t-hero .t-col{padding-top:0}
 
@@ -123,8 +138,12 @@ button{font:inherit}
    Below 900px there is no margin and no index, so the label is a visible
    section heading exactly as before. */
 @media (min-width:900px){
-  .t-lab{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
-    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  /* The label pins while its section is in view. It was briefly clipped here so
+     the index could have the column to itself, and that emptied the margin
+     completely: the rationale calls for a column carrying a small section
+     label, not a column carrying nothing. The index yields to whatever is under
+     it, which is what lets both live here. */
+  .t-lab{position:sticky;top:78px;align-self:start}
   /* The content column is placed explicitly, because clipping the label takes
      it out of the grid flow and a two track grid with one remaining in-flow
      child puts that child in track ONE. Without this the whole right hand
@@ -146,7 +165,7 @@ button{font:inherit}
 .t-index a:hover,.t-index a[aria-current="true"]{color:var(--ink)}
 
 /* ---------- Content column ---------- */
-.t-col{padding-top:22px;min-width:0}
+.t-col{padding-top:14px;min-width:0}
 
 /* ---------- Display type: large but never heavy ---------- */
 .t-d1{font-family:var(--serif);font-weight:300;font-size:clamp(2.3rem,5.4vw,4.1rem);
@@ -199,6 +218,20 @@ button{font:inherit}
    every box becomes a portrait slot that cover then crops hard into. */
 .t-media img,.t-media video{width:100%;height:auto;object-fit:cover}
 .t-media{overflow:hidden}
+/* The work answers the pointer. The page had nothing that responded to a
+   reader at all: every beat was triggered by scrolling past it, so once you
+   had scrolled the page was inert. A photograph that moves when you reach for
+   it is the cheapest honest engagement there is, and it is on the one element
+   this design says is allowed to be loud. */
+.t-media img{transition:transform .7s var(--ease-out)}
+.t-reel > .t-media{cursor:grab}
+.t-reel > .t-media:hover img,.t-reel > .t-media:focus-within img{transform:scale(1.045)}
+.t-media__z{display:block;overflow:hidden}
+.t-media__z:hover img{transform:scale(1.045)}
+@media (prefers-reduced-motion:reduce){
+  .t-media img{transition:none}
+  .t-reel > .t-media:hover img,.t-media__z:hover img{transform:none}
+}
 /* Only the reel forces a ratio, so the cards line up. 3:2 is the native ratio
    of three of the four photographs in it, so it crops almost nothing. */
 .t-reel .t-media img{aspect-ratio:3/2}
@@ -226,11 +259,25 @@ b,strong{font-weight:600}
 
 /* ---------- The carousel: the one element that refuses the container ---------- */
 .t-reel{display:flex;gap:var(--gap);overflow-x:auto;scroll-snap-type:x mandatory;
-  scrollbar-width:none;padding-block:4px;
+  scrollbar-width:thin;scrollbar-color:var(--rule) transparent;padding-block:4px;
   /* bleeds both edges: it is the only thing on the page that does */
   margin-inline:calc(-1 * var(--edge));padding-inline:var(--edge);
   scroll-padding-inline-start:var(--edge)}
-.t-reel::-webkit-scrollbar{display:none}
+/* A scrollable region with its scrollbar suppressed and no other control is a
+   region that does not scroll, for anyone without a trackpad. The bar is back,
+   slim, and there are buttons beside it. */
+.t-reel::-webkit-scrollbar{height:6px}
+.t-reel::-webkit-scrollbar-track{background:transparent}
+.t-reel::-webkit-scrollbar-thumb{background:var(--rule);border-radius:6px}
+.t-reel__nav{display:flex;gap:10px;margin-top:18px}
+.t-reel__b{display:inline-flex;align-items:center;justify-content:center;
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--rule);
+  background:var(--ground);color:var(--ink);cursor:pointer;
+  transition:border-color .25s var(--ease),transform .25s var(--ease)}
+.t-reel__b:hover{border-color:var(--ink)}
+.t-reel__b:disabled{opacity:.35;cursor:default}
+.t-reel__b svg{width:15px;height:15px}
+@media (prefers-reduced-motion:reduce){.t-reel__b{transition:none}}
 .t-reel > *{scroll-snap-align:start;flex:0 0 min(78vw,560px)}
 @media (min-width:900px){
   /* past the container, out to the viewport edge. Everything else on the page
@@ -469,10 +516,23 @@ b,strong{font-weight:600}
      so this is the only structured navigation a scriptless reader has. */
   .t-watch{display:block;position:static;z-index:60;
     max-width:var(--frame);margin:0 auto;padding:6px var(--edge) 26px}
-  .t-watch > svg{width:36px;height:42px}
-  [data-pin] .t-watch{position:fixed;bottom:34px;padding:0;margin:0;
-    width:var(--watch,148px);height:calc(var(--watch,148px) * 42 / 36);
-    left:max(var(--edge),calc((100vw - var(--frame)) / 2 + var(--edge)))}
+  .t-watch > svg{width:30px;height:35px}
+  /* Smaller, and pinned to the page's edge rather than the frame's, so it sits
+     in the outer margin instead of inside the column the text has to share. */
+  /* Below 1300px the frame fills the window, so there is no outer margin for
+     the device to sit in and it would spend most of the page stepping back out
+     of the way of the column. A control that is hidden more often than it is
+     visible is worse than one that is not there, so below that width it rests
+     in the flow as an ordinary block of contents, which is the same state a
+     scriptless page gets. Above it, there is room and it never has to move. */
+  [data-pin] .t-watch{position:fixed;bottom:30px;padding:0;margin:0;
+    width:var(--watch,104px);height:calc(var(--watch,104px) * 42 / 36);
+    left:clamp(18px,2.4vw,44px)}
+  @media (max-width:1300px){
+    [data-pin] .t-watch{position:static;padding:6px var(--edge) 26px;
+      width:auto;height:auto}
+    [data-pin] .t-watch > svg{position:static;width:30px;height:35px}
+  }
   /* Stepped back because the margin under it is in use. visibility rather than
      opacity, so it leaves the tab order with it: a control a reader cannot see
      should not be a control they can land on. */
@@ -481,17 +541,27 @@ b,strong{font-weight:600}
      crowding the foot of the screen. A fixed element in a corner is the exact
      shape that has already caused an overlap in this project, so the band where
      it appears and the screen is shortest is the band it must be smallest in. */
-  @media (max-height:760px){ .t-watch{--watch:104px} }
+  @media (max-height:760px){ .t-watch{--watch:68px} }
   [data-pin] .t-watch > svg{position:absolute;inset:0;width:100%;height:100%;
     overflow:visible;pointer-events:none}
   /* Default is complete. With no script the device is simply the mark, drawn,
      rather than an empty box: it degrades to the thing it assembles towards.
      Transitions are off until the first draw has landed, so the device never
      animates from complete to empty on load. */
+  /* A ghost of the finished mark sits behind the drawn one, so at the top of
+     the page the device reads as the logo waiting to be filled rather than as
+     nine dots floating in space. Decorative and aria-hidden: the points are
+     what identify the links, and they carry the contrast. */
+  .t-watch__g path{stroke-dasharray:none !important;stroke-dashoffset:0 !important;
+    opacity:.1 !important}
   .t-watch path{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;
     stroke-dasharray:var(--len,120);stroke-dashoffset:var(--off,0);
     opacity:.26;transition:none}
-  .t-watch[data-ready] path{transition:stroke-dashoffset .7s var(--ease-out),opacity .4s var(--ease)}
+  /* No transition on the draw. It followed the scroll in nine discrete jumps
+     eased over .7s, which reads as a sequence of stages rather than as a line
+     being drawn, and arrives late enough to feel like lag. It now tracks the
+     scroll exactly: move the page and the mark moves with it. */
+  .t-watch[data-ready] path{transition:opacity .3s var(--ease)}
   /* the run you are reading is the one at full strength */
   .t-watch path[data-live]{opacity:1}
   /* The device renders no name of its own. The header names the current
