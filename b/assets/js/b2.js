@@ -607,6 +607,19 @@
     });
   }
 
+
+  /* Show our thinking: our commentary on the client's page, off by default. */
+  function thinking() {
+    var b = $('.t-tt');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-pressed') === 'true';
+      b.setAttribute('aria-pressed', String(!on));
+      document.body.setAttribute('data-thinking', on ? 'off' : 'on');
+      $('.t-tt__l', b).textContent = on ? 'Show our thinking' : 'Hide our thinking';
+    });
+  }
+
   function init() {
     var root = document.documentElement;
     try {
@@ -625,7 +638,7 @@
        reported, so a dead beat is never silent */
     [['head', head], ['watch', watch], ['index', index], ['region', region],
      ['accordion', accordion], ['video', video], ['forms', forms],
-     ['journey', journey], ['reel', reel]].forEach(function (pair) {
+     ['journey', journey], ['reel', reel], ['thinking', thinking]].forEach(function (pair) {
       try { pair[1](); } catch (e) { fail(pair[0], e); }
     });
     try {

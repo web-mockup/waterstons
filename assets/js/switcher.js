@@ -12,8 +12,8 @@
 
   var OPTIONS = [
     { key: 'a', seg: '', label: 'Option A' },
-    { key: 'b', seg: '/b', label: 'Option B: Show Your Working' },
-    { key: 'c', seg: '/c', label: 'Option C: The Scroll Is The Argument' }
+    { key: 'b', seg: '/b', label: 'Option B' },
+    { key: 'c', seg: '/c', label: 'Option C' }
   ];
 
   /* Which option are we on, and what is the page within it.

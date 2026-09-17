@@ -390,6 +390,18 @@
     });
   }
 
+  /* Show our thinking: our commentary on the client's page, off by default. */
+  function thinking() {
+    var b = $('.c-tt');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-pressed') === 'true';
+      b.setAttribute('aria-pressed', String(!on));
+      document.body.setAttribute('data-thinking', on ? 'off' : 'on');
+      $('.c-tt__l', b).textContent = on ? 'Show our thinking' : 'Hide our thinking';
+    });
+  }
+
   function init() {
     var root = document.documentElement;
     if (reduced) {
@@ -422,7 +434,7 @@
        its pause control, because one of those is a nicety and the other is a
        conformance requirement. */
     [['marquee', marquee], ['parallax', parallax], ['forms', forms],
-     ['video', video]].forEach(function (pair) {
+     ['video', video], ['thinking', thinking]].forEach(function (pair) {
       try { pair[1](); } catch (e) { fail(pair[0], e); }
     });
   }

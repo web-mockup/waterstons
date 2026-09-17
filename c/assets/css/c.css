@@ -115,7 +115,8 @@ ul,ol{padding:0;list-style:none}
 .c-crumb li{display:flex;align-items:center;gap:8px}
 .c-crumb li + li::before{content:"/";color:var(--on-navy-2);opacity:.55}
 .c-crumb a{color:var(--on-navy-2);text-decoration:none;
-  border-bottom:1px solid transparent;padding-block:2px}
+  border-bottom:1px solid transparent;display:inline-flex;align-items:center;
+  min-height:24px;padding-block:4px}
 .c-crumb a:hover{color:var(--on-navy);border-bottom-color:var(--rule-navy)}
 .c-crumb [aria-current]{color:var(--on-navy)}
 .c-open--section .c-title{font-size:clamp(30px,4vw,56px)}
@@ -505,3 +506,34 @@ ul,ol{padding:0;list-style:none}
 .c-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .c-note{font-size:13px;color:var(--on-navy-2);max-width:52ch}
 .c-form button{justify-self:start}
+
+/* ---------- Show our thinking ----------
+   Each note pairs a quotation from the brief with the thing on the page
+   that answers it. Off by default: it is our commentary on the client's page. */
+.c-think{display:none}
+body[data-thinking="on"] .c-think{display:block}
+.c-think{position:absolute;z-index:40;top:20px;right:20px;max-width:302px;
+  background:var(--ground);color:var(--ink);padding:17px 19px;
+  font-family:var(--sans);font-size:13px;line-height:1.52;
+  box-shadow:0 18px 40px rgba(0,0,0,.34);border-left:2px solid var(--green)}
+.c-think p{margin:0}
+.c-think b{color:var(--ink);font-weight:600}
+.c-think i{font-style:italic}
+.c-act--light .c-think,.c-sect .c-think{background:var(--navy);color:var(--on-navy)}
+.c-act--light .c-think b,.c-sect .c-think b{color:var(--green)}
+@media (max-width:1100px){.c-think{position:static;max-width:none;margin:22px auto 0;
+  max-width:var(--frame)}}
+.c-tt{position:fixed;right:18px;bottom:76px;z-index:150;display:inline-flex;
+  align-items:center;gap:9px;min-height:44px;padding:10px 18px;border-radius:999px;
+  cursor:pointer;background:var(--ground);color:var(--ink);border:0;font:inherit;
+  font-size:13px;font-weight:600;box-shadow:0 10px 26px rgba(0,0,0,.28)}
+.c-tt__d{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
+.c-tt[aria-pressed="true"] .c-tt__d{background:#1d9e4b}
+@media print{.c-tt,.c-think{display:none !important}}
+
+body[data-thinking="on"] .c-frame{padding-right:calc(var(--edge) + 336px)}
+body[data-thinking="on"] .c-think{right:var(--edge);top:26px}
+@media (max-width:1400px){
+  body[data-thinking="on"] .c-frame{padding-right:var(--edge)}
+  body[data-thinking="on"] .c-think{position:static;max-width:none;margin:22px 0 0}
+}
