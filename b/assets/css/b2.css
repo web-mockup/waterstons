@@ -187,6 +187,27 @@ button{font:inherit}
 .t-note a{display:inline-flex;align-items:center;min-height:24px}
 .t-navy .t-note{color:var(--on-navy-2)}
 
+/* ---------- A section page says what page it is ----------
+   The section headline used to be an aphorism about the firm at exactly the
+   homepage's size, with nothing above it. That is a homepage, quieter. Three
+   signals of rank, in the order they matter: the parent named, the page
+   titled, and the firm's line kept but demoted to where a standfirst belongs.
+   A reader who arrived from a search result or an event is told where they
+   landed, which is the reader the brief's Section 3 describes. */
+.t-eyebrow{display:flex;align-items:center;gap:9px;margin:0 0 16px;
+  font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--ink-3)}
+.t-eyebrow a{color:var(--ink-3);text-decoration:none;border-bottom:1px solid transparent}
+.t-eyebrow a:hover{color:var(--ink);border-bottom-color:var(--rule)}
+.t-eyebrow b{color:var(--ink);font-weight:500}
+.t-stand{margin:18px 0 0;font-family:var(--serif);font-weight:300;
+  font-size:clamp(20px,2.4vw,30px);line-height:1.28;letter-spacing:-.01em;
+  color:var(--ink-2);max-width:26ch}
+/* The page title is a rank below the brand statement it sits under. Scoped to
+   the section hero: written unscoped it took the homepage's headline down with
+   it, which is the opposite of the point. */
+.t-hero--section h1.t-d1{font-size:clamp(28px,3.3vw,42px)}
+
 /* ---------- The one live line under the headline ---------- */
 .t-live{display:flex;align-items:flex-start;gap:11px;margin-top:26px;
   font-size:14px;line-height:1.5;color:var(--ink-2);max-width:56ch}

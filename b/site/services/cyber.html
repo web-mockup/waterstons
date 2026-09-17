@@ -20,6 +20,7 @@ where scripts run but b2.js never arrives: the flag is withdrawn and the page
 returns to that same safe block. */
 (function(){var d=document.documentElement;d.setAttribute('data-pin','');
 setTimeout(function(){if(!d.hasAttribute('data-pin-ok'))d.removeAttribute('data-pin');},2500);})();</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Waterstons","description":"Technology and growth partners. A technology consultancy working across advisory, technology, data and AI, and cyber.","address":{"@type":"PostalAddress","streetAddress":"Liddon Court, Aykley Heads","addressLocality":"Durham","postalCode":"DH1 5TS","addressCountry":"GB"},"telephone":"+44 345 094 0945","email":"info@waterstons.com","logo":"../../../assets/brand/logo.svg"},{"@type":"Service","name":"Cyber security","description":"Audits, detection and response, penetration testing and certification, with a 24/7 CREST certified Security Operations Centre.","serviceType":"Cyber security","provider":{"@type":"Organization","name":"Waterstons"},"areaServed":[{"@type":"Country","name":"United Kingdom"},{"@type":"Country","name":"Australia"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"../index.html"},{"@type":"ListItem","position":2,"name":"Services","item":"../index.html#work"},{"@type":"ListItem","position":3,"name":"Cyber security"}]}]}</script>
 <link rel="stylesheet" href="../../assets/css/b2.css">
 <link rel="stylesheet" href="../../../assets/css/switcher.css">
 <link rel="icon" href="../../../assets/brand/logo.svg" type="image/svg+xml">
@@ -64,7 +65,7 @@ setTimeout(function(){if(!d.hasAttribute('data-pin-ok'))d.removeAttribute('data-
     <li><a href="#proof"><span>Proof</span></a></li>
     <li><a href="#accredited"><span>Accredited</span></a></li>
     <li><a href="#inside"><span>Inside</span></a></li>
-    <li><a href="#sectors"><span>Sectors</span></a></li>
+    <li><a href="#sectors"><span>In your sector</span></a></li>
     <li><a href="#outcomes"><span>Outcomes</span></a></li>
     <li><a href="#guide"><span>Guide</span></a></li>
     <li><a href="#faq"><span>Answers</span></a></li>
@@ -74,7 +75,7 @@ setTimeout(function(){if(!d.hasAttribute('data-pin-ok'))d.removeAttribute('data-
 
 <main id="main">
 
-<section class="t-sec t-hero" id="hero">
+<section class="t-sec t-hero t-hero--section" id="hero">
   <div class="t-frame">
     <nav class="t-note" aria-label="Breadcrumb" style="padding-top:8px">
       <ol style="display:flex;gap:8px;flex-wrap:wrap">
@@ -86,7 +87,9 @@ setTimeout(function(){if(!d.hasAttribute('data-pin-ok'))d.removeAttribute('data-
     <div class="t-row">
       <span data-lab="Cyber" aria-hidden="true"></span>
       <div class="t-col">
-        <h1 class="t-d1">Keeping the bad guys out, without getting in your way.</h1>
+        <p class="t-eyebrow"><a href="../index.html#work">Services</a><span aria-hidden="true">/</span><b>Cyber security</b></p>
+        <h1 class="t-d1">Cyber security</h1>
+        <p class="t-stand">Keeping the bad guys out, without getting in your way.</p>
         <p class="t-live">
           <svg class="t-live__i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6c0 4-2 5-2 5h16s-2-1-2-5a6 6 0 0 0-6-6zM10 20a2 2 0 0 0 4 0"/></svg>
           <span><b>24/7</b> CREST certified Security Operations Centre, assured by the NCSC, BSI and CREST.</span>
@@ -216,7 +219,7 @@ setTimeout(function(){if(!d.hasAttribute('data-pin-ok'))d.removeAttribute('data-
   <div class="t-frame">
     <hr class="t-rule">
     <div class="t-row">
-      <h2 class="t-lab" data-lab="Sectors"><svg class="t-lab__m" viewBox="0 0 36 42" aria-hidden="true"><path d="M2.00 2v18a16.00 16.00 0 0 0 32.00 0V2"/><path d="M5.07 2v18a12.93 12.93 0 0 0 25.86 0V2"/><path d="M15.15 2v18a2.85 2.85 0 0 0 5.70 0V2"/></svg>Sectors</h2>
+      <h2 class="t-lab" data-lab="In your sector"><svg class="t-lab__m" viewBox="0 0 36 42" aria-hidden="true"><path d="M2.00 2v18a16.00 16.00 0 0 0 32.00 0V2"/><path d="M5.07 2v18a12.93 12.93 0 0 0 25.86 0V2"/><path d="M15.15 2v18a2.85 2.85 0 0 0 5.70 0V2"/></svg>In your sector</h2>
       <div class="t-col">
         <ul class="t-list">
           <li class="t-item t-in">

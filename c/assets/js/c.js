@@ -352,6 +352,25 @@
     });
   }
 
+  /* ---------- The video facade -------------------------------------------
+     A concept, so there is no film to load. It says so plainly rather than
+     doing nothing, because a control that appears to fail is worse than one
+     that explains itself. */
+  function video() {
+    $$('[data-video]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var fig = btn.closest('figure');
+        if (!fig) return;
+        var note = fig.querySelector('.c-video__c .c-plate__d');
+        if (note) {
+          note.textContent = 'In the live build this loads the film. This concept does not.';
+          note.setAttribute('role', 'status');
+        }
+        btn.disabled = true;
+      });
+    });
+  }
+
   /* ---------- Per word staging -------------------------------------------- */
 
   function masks() {
@@ -402,7 +421,8 @@
        than taking the others with it. A dead parallax must not cost the page
        its pause control, because one of those is a nicety and the other is a
        conformance requirement. */
-    [['marquee', marquee], ['parallax', parallax], ['forms', forms]].forEach(function (pair) {
+    [['marquee', marquee], ['parallax', parallax], ['forms', forms],
+     ['video', video]].forEach(function (pair) {
       try { pair[1](); } catch (e) { fail(pair[0], e); }
     });
   }

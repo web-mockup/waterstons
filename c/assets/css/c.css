@@ -104,6 +104,25 @@ ul,ol{padding:0;list-style:none}
 .c-body{font-size:clamp(16px,1.35vw,19px);line-height:1.62;color:var(--on-navy-2);max-width:62ch}
 .c-on-light .c-body{color:var(--ink-2)}
 
+/* ---------- A section page says what page it is ----------
+   Option C had no breadcrumb on either page and opened its section page with a
+   statement about the firm at the homepage's 140px. A reader arriving from a
+   search result had nothing telling them where they had landed. */
+.c-crumb{margin:0 0 18px}
+.c-crumb ol{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--on-navy-2)}
+.c-crumb li{display:flex;align-items:center;gap:8px}
+.c-crumb li + li::before{content:"/";color:var(--on-navy-2);opacity:.55}
+.c-crumb a{color:var(--on-navy-2);text-decoration:none;
+  border-bottom:1px solid transparent;padding-block:2px}
+.c-crumb a:hover{color:var(--on-navy);border-bottom-color:var(--rule-navy)}
+.c-crumb [aria-current]{color:var(--on-navy)}
+.c-open--section .c-title{font-size:clamp(30px,4vw,56px)}
+.c-stand{margin-top:clamp(18px,2.4vw,30px);font-family:var(--serif);font-weight:300;
+  font-size:clamp(20px,2.4vw,32px);line-height:1.22;letter-spacing:-.012em;
+  color:var(--on-navy-2);max-width:26ch}
+
 /* ---------- Acts ---------- */
 .c-act{position:relative;padding-block:clamp(72px,11vw,150px)}
 .c-act--light{background:var(--ground);color:var(--ink)}

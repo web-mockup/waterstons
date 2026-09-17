@@ -8,6 +8,7 @@
 <link rel="preload" as="font" type="font/woff2" href="../../../assets/fonts/newsreader-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="../../../assets/fonts/poppins-400.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="../../../assets/fonts/poppins-600.woff2" crossorigin>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Waterstons","description":"Technology and growth partners. A technology consultancy working across advisory, technology, data and AI, and cyber.","address":{"@type":"PostalAddress","streetAddress":"Liddon Court, Aykley Heads","addressLocality":"Durham","postalCode":"DH1 5TS","addressCountry":"GB"},"telephone":"+44 345 094 0945","email":"info@waterstons.com","logo":"../../../assets/brand/logo.svg"},{"@type":"Service","name":"Cyber security","description":"Audits, detection and response, penetration testing and certification, with a 24/7 CREST certified Security Operations Centre.","serviceType":"Cyber security","provider":{"@type":"Organization","name":"Waterstons"},"areaServed":[{"@type":"Country","name":"United Kingdom"},{"@type":"Country","name":"Australia"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"../index.html"},{"@type":"ListItem","position":2,"name":"Services","item":"../index.html#work"},{"@type":"ListItem","position":3,"name":"Cyber security"}]}]}</script>
 <link rel="stylesheet" href="../../assets/css/c.css">
 <link rel="stylesheet" href="../../../assets/css/switcher.css">
 <link rel="icon" href="../../../assets/brand/logo.svg" type="image/svg+xml">
@@ -28,10 +29,18 @@
 
 <main id="main">
 
-<section class="c-act c-open" id="open">
+<section class="c-act c-open c-open--section" id="open">
   <svg class="c-arcs" viewBox="0 0 400 360" fill="none" aria-hidden="true"><path d="M28 0v186a172 172 0 0 0 344 0V0"/><path d="M61 0v186a139 139 0 0 0 278 0V0"/><path d="M169.4 0v186a30.6 30.6 0 0 0 61.2 0V0"/></svg>
   <div class="c-frame c-open__in">
-    <h1 class="c-d0" data-words>New threats. Shifting priorities. And no room for disruption.</h1>
+    <nav class="c-crumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#work">Services</a></li>
+        <li><span aria-current="page">Cyber security</span></li>
+      </ol>
+    </nav>
+    <h1 class="c-d1 c-title" data-words>Cyber security</h1>
+    <p class="c-stand c-in">New threats. Shifting priorities. And no room for disruption.</p>
     <p class="c-open__p c-in">Assured by the <b>NCSC</b>, <b>BSI</b> and <b>CREST</b>.
     A 24/7 CREST certified Security Operations Centre behind all of it.</p>
   </div>
@@ -184,7 +193,7 @@
 <section class="c-sect c-on-light" id="sectors" aria-labelledby="sectors-h">
   <div class="c-frame c-sect__g">
     <div class="c-sect__h">
-      <p class="c-lab c-in" id="sectors-h">Sectors</p>
+      <p class="c-lab c-in" id="sectors-h">In your sector</p>
       <p class="c-d2 c-sect__t c-in">The same controls land differently depending on what you do.</p>
     </div>
     <ul class="c-sect__l">
@@ -204,6 +213,33 @@
             <span class="c-sect__n">Professional services</span><span class="c-sect__d">Law, finance and advisory, where confidentiality is the product. We supported Burness Paull LLP on business continuity and incident response planning.</span>
           </li>
     </ul>
+  </div>
+</section>
+
+<!-- Video. Section 4 of the brief calls the ability to host video "a must" and
+     Section 7 wants it "to bring our offer to life". A poster and a click to
+     load, never an autoplaying embed: the film is not fetched until a reader
+     asks for it, so it costs nothing on a page nobody watches it on. -->
+<section class="c-act" id="film" aria-labelledby="film-h">
+  <div class="c-frame">
+    <h2 class="c-lab c-in" id="film-h">Inside the SOC</h2>
+    <figure class="c-video c-in">
+      <div class="c-video__f">
+        <img src="../../../assets/img/video-poster-cyber-800.webp"
+             srcset="../../../assets/img/video-poster-cyber-720.webp 720w, ../../../assets/img/video-poster-cyber-800.webp 800w"
+             sizes="(min-width:900px) 620px, 92vw" width="800" height="450"
+             alt="A Waterstons colleague at work in the Security Operations Centre." loading="lazy">
+        <button class="c-video__b" type="button" data-video="Security Operations Centre film">
+          <span class="c-video__i" aria-hidden="true"></span>
+          <span>Play the film<span class="c-sr">, Security Operations Centre, 2 minutes 10</span></span>
+          <span class="c-video__t" aria-hidden="true">2:10</span>
+        </button>
+      </div>
+      <figcaption class="c-video__c">
+        <span class="c-plate__n">Inside the SOC</span>
+        <span class="c-plate__d">Nothing loads until you press play.</span>
+      </figcaption>
+    </figure>
   </div>
 </section>
 
