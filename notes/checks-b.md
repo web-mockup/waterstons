@@ -388,6 +388,76 @@ every HTML entity form of them: named, decimal and hexadecimal. The entity forms
 reason it exists. Two em dashes survived every earlier literal-only sweep because they
 had been written as named entities rather than as characters.
 
+## The margin index
+
+The label column carries an index of the page's sections, drawn on the geometry
+of the Waterstons mark: one point per labelled section, nine on the homepage and
+eight on Cyber, each a link to its section. The mark assembles as a reader moves
+down, and the ink reaches a point as the reader reaches that section.
+
+It is built as an ordinary `nav` containing a list of anchors. Assistive
+technology and keyboards get a plain section index with no invented semantics,
+and the script only moves the entries onto the arc. The list is generated from
+the finished page rather than kept beside it, so it cannot point at a section
+that has been renamed or removed.
+
+### Four states, all checked
+
+| State | Result |
+|---|---|
+| Motion | Placed on the arc, 9 and 8 links, none dead |
+| `prefers-reduced-motion` | Placed, and the mark renders complete. The assembly is decoration; marking where you are is information, so the information survives |
+| No JavaScript | A plain vertical index of the same links, all working |
+| Script blocked at the network | The same |
+
+Zero page errors in all four.
+
+### Keyboard
+
+Measured the same way before and after, on the published pages and the new
+ones: 28 stops to 37 on the homepage, 36 to 44 on Cyber. Exactly nine and eight
+added, every one of them in the index, and nothing else moved. No stop is
+unnamed, none is under 24px, none lands on something a reader cannot see. The
+closest pair of points is 38px apart, against the 24px that WCAG 2.5.8 asks for.
+
+### It steps back when the margin is busy
+
+The index is pinned to the foot of the viewport, so it passes over parts of the
+page with no margin to borrow: the footer runs full width, and the Cyber page's
+services section already carries its own index of six services in that column.
+Where the column is occupied, the index steps back rather than competing, and it
+leaves the tab order while it is away.
+
+Checked by asking what is actually beneath it rather than keeping a list of
+things to avoid, so a section added later cannot silently break it. Five
+viewport sizes, 31 scroll positions each, with and without a script: it never
+sits on readable text.
+
+### Below 900px
+
+There is no margin, so there is no index, exactly as the column itself
+disappears. That is an enhancement being withdrawn rather than navigation going
+missing: the header menu and the index sheet carry every one of these
+destinations at every width.
+
+## Images reserve their space before they arrive
+
+Two rows of marks were styled with an automatic height capped by a maximum,
+which gives the box nothing definite to resolve from while the request is still
+in flight. Each mark measured nothing at all until its bytes landed, and the row
+then grew by a whole line at a time: 270px on the accreditations at phone width,
+130px on the client logos.
+
+Both now set a definite height, so the width resolves from the dimensions the
+images already declare. The rendered result is identical.
+
+**Tested by delaying each request rather than blocking it.** An aborted request
+resolves immediately and the browser falls back to the declared size, so a
+blocked image looks perfectly reserved when it is not. Only a request left
+hanging reproduces what someone on a slow connection sees. Every image on every
+page across all three options now holds its space: no section grows when the
+pictures arrive.
+
 ## Confidentiality
 
 `assets/scratch/confcheck.py` sweeps everything a commit would carry, asking git for the

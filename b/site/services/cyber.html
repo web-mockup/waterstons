@@ -10,6 +10,16 @@
 <link rel="preload" as="image" href="../../../assets/img/cyber-wide-1400.webp"
       imagesrcset="../../../assets/img/cyber-wide-900.webp 900w, ../../../assets/img/cyber-wide-1400.webp 1400w"
       imagesizes="(min-width:900px) 62vw, 92vw" fetchpriority="high">
+<script>/* The index is pinned from first paint when a script can run at all, so it
+never occupies flow and then leaves it: measured, that transition cost CLS
+0.3352 as 301px of page jumped upward. This sets POSITIONING only, never
+visibility, so nothing can be hidden by it. With no JavaScript this does not run
+either, and the index stays an ordinary block of contents under the header,
+which is the state it needs to be safe in. The watchdog covers the third case,
+where scripts run but b2.js never arrives: the flag is withdrawn and the page
+returns to that same safe block. */
+(function(){var d=document.documentElement;d.setAttribute('data-pin','');
+setTimeout(function(){if(!d.hasAttribute('data-pin-ok'))d.removeAttribute('data-pin');},2500);})();</script>
 <link rel="stylesheet" href="../../assets/css/b2.css">
 <link rel="stylesheet" href="../../../assets/css/switcher.css">
 <link rel="icon" href="../../../assets/brand/logo.svg" type="image/svg+xml">
@@ -45,12 +55,21 @@
   </div>
 </header>
 
-<div class="t-watch" aria-hidden="true">
-  <svg viewBox="0 0 36 42" fill="none">
+<nav class="t-watch" aria-label="Sections" data-count="8">
+  <svg viewBox="0 0 36 42" fill="none" aria-hidden="true">
     <path d="M2.00 2v18a16.00 16.00 0 0 0 32.00 0V2"/><path d="M5.07 2v18a12.93 12.93 0 0 0 25.86 0V2"/><path d="M15.15 2v18a2.85 2.85 0 0 0 5.70 0V2"/>
   </svg>
-  <span class="t-watch__n"></span>
-</div>
+  <ol class="t-watch__l">
+    <li><a href="#proof"><span>Proof</span></a></li>
+    <li><a href="#accredited"><span>Accredited</span></a></li>
+    <li><a href="#inside"><span>Inside</span></a></li>
+    <li><a href="#sectors"><span>Sectors</span></a></li>
+    <li><a href="#outcomes"><span>Outcomes</span></a></li>
+    <li><a href="#guide"><span>Guide</span></a></li>
+    <li><a href="#faq"><span>Answers</span></a></li>
+    <li><a href="#enquiry"><span>Contact</span></a></li>
+  </ol>
+</nav>
 
 <main id="main">
 

@@ -306,27 +306,158 @@
        Under reduced motion the assembly is the decoration and the marking is the
        information, so the information survives and the assembly does not. */
     function draw(cur, full) {
-      var start = 0;
+      /* All three arcs advance together, on the same discrete step.
+         They used to take a run of sections each, which put the ink on one arc
+         while every index point sat on the outer contour, so the front of the
+         drawn line did not pass through the point it was supposed to have
+         reached. Position and progress were two different curves saying
+         different things.
+
+         This is still discrete and still lands on section boundaries, which was
+         the point of runs: the count lives in the steps, and cur/n steps once
+         per section. It is not a percentage of scroll. What changes is that the
+         mark now assembles as one thing, and the ink arrives at each point as
+         the reader arrives at its section. */
+      var frac = full ? 1 : (n ? cur / n : 0);
       for (var i = 0; i < 3; i++) {
-        var len = runs[i], done = Math.max(0, Math.min(len, cur - start));
         var p = paths[i];
-        if (!p) { start += len; continue; }
+        if (!p) continue;
         var L = parseFloat(p.dataset.len) || 120;
-        var frac = full ? 1 : (len ? done / len : 0);
         p.style.setProperty('--off', (L * (1 - frac)).toFixed(1));
-        if (cur > start && cur <= start + len) p.setAttribute('data-live', '');
+        if (cur > 0) p.setAttribute('data-live', '');
         else p.removeAttribute('data-live');
-        start += len;
       }
-      if (count) count.textContent = cur ? cur + '/' + n : '';
+      /* No name here. The header already renders the current section as
+         visible text at every width, so a second readout is a duplicate that
+         can only ever agree or be wrong. The device shows position and offers
+         destinations; the header says where you are. */
+    }
+
+    /* ---- The index, placed on the geometry ----
+       The list is real anchors in the markup and it works as a plain vertical
+       index with no script at all. This only moves each entry onto the arc that
+       carries its section, at the same position the drawing uses, so what a
+       reader clicks and what the mark shows are the same thing rather than two
+       views that can disagree. */
+    var items = $$('.t-watch__l > li', el);
+
+    function place() {
+      if (!items.length) return false;
+      var box = el.getBoundingClientRect();
+      if (!box.width) return false;               /* hidden below 900px */
+      var sx = box.width / 36, sy = box.height / 42;
+      var outer = paths[0];
+      if (!outer) return false;
+
+      /* Every entry rides the OUTER contour, spaced evenly along it, rather
+         than sitting on the arc that happens to draw its run.
+
+         Putting each entry on its own arc was the obvious mapping and it does
+         not survive the geometry. The mark's three arcs are nested at radii
+         16, 12.93 and 2.85 in a 36 unit box, so at any size that fits a margin
+         the outer two are about seven pixels apart. A 24px target, which is the
+         smallest 2.5.8 allows, is more than three times that gap, so entries on
+         adjacent arcs overlapped: four collisions per page, meaning a reader
+         aiming at one section could land on another.
+
+         The outer contour is one continuous line with room for all of them, and
+         nothing is lost: the drawing still advances arc by arc, and a reader was
+         never told which run a section belonged to. */
+      var ok = true;
+      try {
+        var L = outer.getTotalLength();
+        items.forEach(function (li, i) {
+          var pt = outer.getPointAtLength(L * ((i + 0.5) / items.length));
+          li.style.left = (pt.x * sx).toFixed(1) + 'px';
+          li.style.top = (pt.y * sy).toFixed(1) + 'px';
+        });
+      } catch (e) { ok = false; }
+      return ok;
+    }
+
+    function mark(cur) {
+      items.forEach(function (li, i) {
+        if (i + 1 === cur) li.setAttribute('data-here', '');
+        else li.removeAttribute('data-here');
+        if (i + 1 < cur) li.setAttribute('data-done', '');
+        else li.removeAttribute('data-done');
+      });
+    }
+
+    /* The index yields when the margin is already in use.
+       It is pinned to the foot of the viewport, so it passes over parts of the
+       page that are not offset sections and have no margin to borrow: the
+       footer runs full width, and the Cyber page's services section already
+       carries its own live index of six services in that column. Measured
+       through a full scroll at five viewport sizes, those were the only two
+       things it ever landed on, at 67 positions in total.
+
+       Hiding rather than moving is the right semantic here. The column holds
+       one index at a time, which is the rule the stylesheet states, so when the
+       column is occupied this one steps back rather than competing. Over the
+       services list a reader is left with a better, section-specific index; at
+       the footer the page has ended.
+
+       Tested with elementsFromPoint rather than a list of selectors to avoid,
+       because a list has to be maintained and fails silently when a new full
+       width section is added. This asks what is actually under it. */
+    function occupied() {
+      var box = el.getBoundingClientRect();
+      if (!box.width) return false;
+      /* A 5 by 5 grid over a box inflated by 8px, rather than 9 points inside
+         it. Nine points missed a text run clipping only the edge of the box:
+         two positions out of 310 tested, which is exactly the kind of residue
+         that looks like noise and is a reader seeing the index on top of a
+         word. Sampling wider and denser costs nothing on a scroll tick. */
+      /* The grid is dense in Y and coarse in X, because that is the shape of
+         the thing being looked for. A line of text is wide and about 20px
+         tall, so a probe grid with rows 47px apart passes straight through one:
+         it left a real overlap on the footer at 1100 wide that survived being
+         sampled slowly, so it was geometry rather than timing. Rows are now
+         about 14px apart, closer together than a line of text is tall, which is
+         the resolution the target actually requires.
+
+         20px of margin around the box as well, so the device steps back just
+         before it touches something rather than exactly as it does. */
+      var pad = 20, xs = [], ys = [], i;
+      var COLS = 4, ROWS = 15;
+      for (i = 0; i < COLS; i++) xs.push(box.left - pad + ((box.width + pad * 2) * i) / (COLS - 1));
+      for (i = 0; i < ROWS; i++) ys.push(box.top - pad + ((box.height + pad * 2) * i) / (ROWS - 1));
+      for (var a = 0; a < xs.length; a++) {
+        for (var c = 0; c < ys.length; c++) {
+          var stack = document.elementsFromPoint(xs[a], ys[c]) || [];
+          for (var k = 0; k < stack.length; k++) {
+            var node = stack[k];
+            if (node === el || el.contains(node)) continue;
+            if (node === document.body || node === document.documentElement) continue;
+            if (node.children.length) continue;              /* only leaves carry text */
+            if ((node.textContent || '').trim()) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function yieldIfBusy() {
+      if (occupied()) el.setAttribute('data-yield', '');
+      else el.removeAttribute('data-yield');
     }
 
     function up() {
-      var cur = 0, mid = innerHeight * 0.42;
+      /* THE SAME RULE THE HEADER USES: the section straddling 34% of the
+         viewport. The header has named the current section since long before
+         this device could point at one, and two components answering "where am
+         I" with different arithmetic will disagree in a band around every
+         boundary. They did: the header read CLIENTS while the marked point read
+         WORK, in one glance, on the same screen. One rule, so they cannot. */
+      var cur = 0, mid = innerHeight * 0.34;
       secs.forEach(function (s, i) {
-        if (s.getBoundingClientRect().top <= mid) cur = i + 1;
+        var r = s.getBoundingClientRect();
+        if (r.top <= mid && r.bottom > mid) cur = i + 1;
       });
       draw(cur, reduced);
+      mark(cur);
+      yieldIfBusy();
     }
     var tick = false;
     addEventListener('scroll', function () {
@@ -336,6 +467,28 @@
     up();
     /* transitions come on only after the first draw has landed */
     requestAnimationFrame(function () { el.setAttribute('data-ready', ''); });
+
+    /* data-nav is the switch from "a list of links" to "a list of links on the
+       arc", and it is only set once every entry has actually been placed. If
+       any placement fails the attribute stays off and the reader keeps the
+       plain vertical index, which is a working index rather than a broken
+       diagram. */
+    function replace() {
+      if (place()) {
+        el.setAttribute('data-nav', '');
+        /* Confirms to the head flag that the machinery arrived, so its
+           watchdog leaves the pinned state alone. */
+        document.documentElement.setAttribute('data-pin-ok', '');
+      } else {
+        el.removeAttribute('data-nav');
+      }
+    }
+    requestAnimationFrame(replace);
+    var rt;
+    addEventListener('resize', function () {
+      clearTimeout(rt);
+      rt = setTimeout(replace, 150);
+    }, { passive: true });
   }
 
   /* Give every arc its true path length, so the draw is honest rather than

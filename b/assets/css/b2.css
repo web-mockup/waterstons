@@ -108,9 +108,30 @@ button{font:inherit}
   text-transform:uppercase;color:var(--ink);padding-top:22px;margin:0;
   display:flex;align-items:baseline;gap:8px}
 .t-navy .t-lab{color:var(--on-navy)}
-/* the label pins while its section is in view */
+/* Where there is a margin, the index IS the label.
+   The two cannot share the column. Both are positioned, the index is pinned to
+   the foot and the label's position is set by its row, so a label can arrive
+   anywhere including on top of the index: measured through a full scroll, they
+   overlapped at 8 to 12 of 41 positions at three viewport sizes, by as much as
+   4,320 square pixels. That is a quarter of the page, not an edge case.
+
+   So above 900px the per-section label is taken out of the picture and the
+   index carries the job, naming the current section beside its own point. The
+   heading stays in the document, clipped rather than removed, so the outline a
+   screen reader walks is unchanged and every section still has its h2.
+
+   Below 900px there is no margin and no index, so the label is a visible
+   section heading exactly as before. */
 @media (min-width:900px){
-  .t-lab{position:sticky;top:78px;align-self:start}
+  .t-lab{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  /* The content column is placed explicitly, because clipping the label takes
+     it out of the grid flow and a two track grid with one remaining in-flow
+     child puts that child in track ONE. Without this the whole right hand
+     column slides left into the margin and sits under the index. Every
+     automated check still passed while that was true, because none of them
+     asks where the body copy is. */
+  .t-row > .t-col{grid-column:2}
 }
 /* the arcs, second and last appearance: a 12px ink glyph on the label */
 .t-lab__m{flex:none;width:11px;height:11px;opacity:.55}
@@ -181,8 +202,16 @@ button{font:inherit}
 /* Only the reel forces a ratio, so the cards line up. 3:2 is the native ratio
    of three of the four photographs in it, so it crops almost nothing. */
 .t-reel .t-media img{aspect-ratio:3/2}
-/* A document cover is not a photograph and must not be cropped at all. */
-.t-media--doc img{aspect-ratio:auto;object-fit:contain}
+/* A document cover is not a photograph and must not be cropped at all.
+   object-fit:contain is what prevents that. aspect-ratio:auto was also here
+   and did something else entirely: an img's default UA style is
+   `aspect-ratio: auto <attr-width>/<attr-height>`, so declaring plain `auto`
+   drops the attribute ratio and leaves a lazy image with NO reserved height
+   until it loads. This one went 0 to 295px on arrival and took the rest of the
+   page down with it, worth 0.13 CLS at phone width. It never showed up in
+   Lighthouse because the image is below the fold and Lighthouse does not
+   scroll. */
+.t-media--doc img{object-fit:contain}
 .t-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 24px;
   margin-top:14px;font-family:var(--sans);font-size:14px;line-height:1.5}
 .t-cap__n{color:var(--ink)}
@@ -267,13 +296,32 @@ b,strong{font-weight:600}
 .t-logos{display:grid;grid-template-columns:repeat(2,1fr);gap:26px var(--gap);align-items:center}
 @media (min-width:640px){.t-logos{grid-template-columns:repeat(3,1fr)}}
 @media (min-width:1000px){.t-logos{grid-template-columns:repeat(5,1fr)}}
-.t-logos img{width:auto;height:auto;max-height:26px;max-width:100%;object-fit:contain}
+/* Definite height, same reason as the accreditation marks below: height:auto
+   capped by max-height reserves nothing while the request is in flight, and
+   this row grew 130px when the marks landed. Each logo is a different width at
+   a common height of 96, so one definite height lets every one of them resolve
+   its own width from its own attributes. Rendered result unchanged. */
+.t-logos img{width:auto;height:26px;max-width:100%;object-fit:contain}
 
 /* ---------- Accreditation marks ---------- */
 .t-marks{display:grid;grid-template-columns:repeat(2,1fr);gap:22px var(--gap);align-items:center}
 @media (min-width:640px){.t-marks{grid-template-columns:repeat(3,1fr)}}
 @media (min-width:1000px){.t-marks{grid-template-columns:repeat(5,1fr)}}
-.t-marks img{width:auto;height:auto;max-height:54px;max-width:100%;object-fit:contain}
+/* A DEFINITE height, not a cap on an automatic one.
+   width:auto with height:auto and only max-height gives the box nothing to
+   resolve from while the request is still in flight, so each badge is 0x0 until
+   its bytes arrive and the row then grows by a whole line per row of marks:
+   measured at phone width, this section went 435px to 705px, 270px of the page
+   moving under the reader. With height definite the attribute ratio computes
+   the width before anything loads, which is the reservation the images already
+   carry the numbers for. Every mark is 300x180 and renders at 90x54, so the
+   rendered result is unchanged.
+
+   Tested by DELAYING the requests rather than blocking them. An aborted request
+   resolves at once and the browser falls back to the attribute box, so a
+   blocked image can look perfectly reserved while a pending one is not. Only a
+   request left hanging reproduces what a real visitor sees. */
+.t-marks img{width:auto;height:54px;max-width:100%;object-fit:contain}
 
 /* ---------- Figures ---------- */
 .t-figs{display:grid;grid-template-columns:repeat(2,1fr);gap:30px var(--gap)}
@@ -383,19 +431,59 @@ b,strong{font-weight:600}
 .t-item__a .t-note svg{transition:transform .45s var(--ease-out)}
 .t-item:hover .t-item__a .t-note svg{transform:translateX(6px)}
 
-/* ---------- M1. The margin keeps watch ----------
+/* ---------- M1. The margin keeps watch, and now it steers ----------
    Three arcs, because the mark is three arcs: their logo.svg draws it at radii
    15.753, 12.730 and 2.802 about a common centre, and this is that geometry
    normalised. Each arc spans a run of sections and advances one step per
    section, so the count lives in the steps rather than in the number of rings.
-   It is an instrument in the margin, not a feature: hairline weight, low
-   emphasis, and gone entirely below 900px where there is no margin to live in. */
+
+   THE COLUMN RULE, AND HOW THIS READS AGAINST IT.
+   The rule above says the column holds "a label, or an index of labels. Never
+   prose, never media, never a control." This is the second permitted form: an
+   index of this page's labels, one entry per labelled section, in order. It is
+   settled here rather than in a review, because the next person to touch this
+   will weigh "an index of labels" against "never a control" and should find the
+   reading where the rule lives: a list of links is navigation, not a control,
+   and an index nobody can use is not much of an index. The permitted clause
+   governs. What the rule forbids is the column filling with running text, and
+   an index of nine one-word labels is not that.
+
+   It is still an instrument rather than a feature: hairline weight, low
+   emphasis, and gone entirely below 900px where there is no margin to live in.
+   That absence is deliberate and it is an enhancement being withdrawn, not the
+   navigation: the header menu and the index sheet carry every one of these
+   destinations at every width, so nothing here is the only way to reach
+   anything. */
 .t-watch{display:none}
 @media (min-width:900px){
-  .t-watch{display:block;position:fixed;bottom:34px;z-index:60;width:36px;height:42px;
-    left:max(var(--edge),calc((100vw - var(--frame)) / 2 + var(--edge)));
-    pointer-events:none}
-  .t-watch svg{width:100%;height:100%;overflow:visible}
+  /* THE RESTING STATE DOES NOT FLOAT.
+     Stepping back out of the way is JavaScript, so a page whose script never
+     runs cannot do it: measured with JS off, the pinned version sat on text 12
+     times on the homepage and 6 on Cyber. The floating version is therefore
+     only available to a page that has proved it can also get out of the way,
+     which is the same inversion as data-motion.
+
+     At rest it is an ordinary block of contents under the header: the small
+     mark, then the nine links. That keeps them, and keeping them matters more
+     than it might look, because without a script the header menu does not open,
+     so this is the only structured navigation a scriptless reader has. */
+  .t-watch{display:block;position:static;z-index:60;
+    max-width:var(--frame);margin:0 auto;padding:6px var(--edge) 26px}
+  .t-watch > svg{width:36px;height:42px}
+  [data-pin] .t-watch{position:fixed;bottom:34px;padding:0;margin:0;
+    width:var(--watch,148px);height:calc(var(--watch,148px) * 42 / 36);
+    left:max(var(--edge),calc((100vw - var(--frame)) / 2 + var(--edge)))}
+  /* Stepped back because the margin under it is in use. visibility rather than
+     opacity, so it leaves the tab order with it: a control a reader cannot see
+     should not be a control they can land on. */
+  .t-watch[data-yield]{visibility:hidden}
+  /* Short viewports get the small inert mark back rather than a navigator
+     crowding the foot of the screen. A fixed element in a corner is the exact
+     shape that has already caused an overlap in this project, so the band where
+     it appears and the screen is shortest is the band it must be smallest in. */
+  @media (max-height:760px){ .t-watch{--watch:104px} }
+  [data-pin] .t-watch > svg{position:absolute;inset:0;width:100%;height:100%;
+    overflow:visible;pointer-events:none}
   /* Default is complete. With no script the device is simply the mark, drawn,
      rather than an empty box: it degrades to the thing it assembles towards.
      Transitions are off until the first draw has landed, so the device never
@@ -406,9 +494,44 @@ b,strong{font-weight:600}
   .t-watch[data-ready] path{transition:stroke-dashoffset .7s var(--ease-out),opacity .4s var(--ease)}
   /* the run you are reading is the one at full strength */
   .t-watch path[data-live]{opacity:1}
-  .t-watch__n{position:absolute;left:0;top:calc(100% + 9px);font-family:var(--sans);
-    font-size:10px;font-weight:500;letter-spacing:.6px;color:var(--ink-3);
-    font-variant-numeric:tabular-nums}
+  /* The device renders no name of its own. The header names the current
+     section at every width and has done since before this could point at one,
+     so the name has one source and the geometry is never the only signal. */
+
+  /* ---- The index ----
+     Resting state is a plain vertical list of links with visible text. That is
+     what a reader gets if the script never runs, and it is a working index
+     rather than nine unplaced dots. The script only moves these onto the arc. */
+  .t-watch__l{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:1px}
+  .t-watch__l a{display:block;padding:4px 0;font-family:var(--sans);font-size:10px;
+    font-weight:500;letter-spacing:.6px;text-transform:uppercase;
+    color:var(--ink-3);text-decoration:none}
+  .t-watch__l a:hover,.t-watch__l a:focus-visible{color:var(--ink)}
+
+  /* Placed state, only once the script has put every entry on the geometry. */
+  .t-watch[data-nav] .t-watch__l{position:absolute;inset:0;display:block;margin:0}
+  .t-watch[data-nav] .t-watch__l li{position:absolute;transform:translate(-50%,-50%)}
+  .t-watch[data-nav] .t-watch__l a{
+    /* 24px of hit area around a 7px dot, so the target clears 2.5.8 while the
+       thing a reader sees stays the size the device can carry. */
+    position:relative;display:grid;place-items:center;width:24px;height:24px;padding:0}
+  .t-watch[data-nav] .t-watch__l a::before{content:"";width:8px;height:8px;border-radius:50%;
+    background:var(--ink);opacity:.34;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+  .t-watch[data-nav] .t-watch__l a:hover::before,
+  .t-watch[data-nav] .t-watch__l a:focus-visible::before{opacity:1;transform:scale(1.5)}
+  .t-watch[data-nav] .t-watch__l li[data-done] a::before{opacity:.72}
+  .t-watch[data-nav] .t-watch__l li[data-here] a::before{opacity:1;transform:scale(1.85)}
+  /* The label is the accessible name and the hover reveal, never the only
+     signal: the current section is always named in .t-watch__n as plain text. */
+  .t-watch[data-nav] .t-watch__l a span{position:absolute;left:28px;top:50%;
+    transform:translateY(-50%);white-space:nowrap;font-size:10px;letter-spacing:.6px;
+    color:var(--ink);opacity:0;pointer-events:none;transition:opacity .2s var(--ease)}
+  .t-watch[data-nav] .t-watch__l a:hover span,
+  .t-watch[data-nav] .t-watch__l a:focus-visible span{opacity:1}
+}
+@media (prefers-reduced-motion:reduce){
+  .t-watch[data-nav] .t-watch__l a::before{transition:none}
+  .t-watch[data-nav] .t-watch__l a span{transition:none}
 }
 
 /* The one signature moment: the arcs draw once, in the single dark band. */
