@@ -29,10 +29,24 @@
         io.unobserve(e.target);
       });
     }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 });
+    /* Anything already on screen at load was being marked finished immediately,
+       so the entire first viewport never animated: the landing screen was
+       static by construction. It now plays on the next frame instead, which
+       keeps the guarantee that nothing stays hidden while letting the page
+       actually arrive. */
+    var onscreen = [];
     items.forEach(function (el) {
       var r = el.getBoundingClientRect();
-      if (r.top < innerHeight && r.bottom > 0) { el.classList.add('is-on'); return; }
+      if (r.top < innerHeight && r.bottom > 0) { onscreen.push(el); return; }
       io.observe(el);
+    });
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        onscreen.forEach(function (el, i) {
+          el.style.transitionDelay = Math.min(i * 45, 420) + 'ms';
+          el.classList.add('is-on');
+        });
+      });
     });
     /* focus reveals its own container, so tabbing never lands on a faded element */
     document.addEventListener('focusin', function (e) {
