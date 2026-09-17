@@ -111,6 +111,20 @@ h3{font-size:clamp(1.15rem,1.6vw,1.4rem);line-height:1.2;letter-spacing:-.018em}
   display:flex;align-items:center;gap:clamp(1rem,3vw,2.5rem)}
 .w-header__logo{flex:none;width:150px;display:flex;align-items:center;min-height:44px}
 .w-nav{display:flex;align-items:center;gap:clamp(1rem,2vw,1.9rem);margin-left:auto}
+/* ---- The menu, for every width where the nav is not there ---- */
+.w-menu{position:fixed;inset:0;z-index:200;background:var(--ground,#fff);overflow-y:auto;
+  padding:18px clamp(1rem,4vw,2.4rem) 40px}
+.w-menu[hidden]{display:none}
+.w-menu__in{max-width:640px;margin-inline:auto}
+.w-menu__top{display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.w-menu__h{display:block;margin:26px 0 2px;font-size:12px;font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-faint)}
+.w-menu__a{display:flex;align-items:center;min-height:52px;padding:6px 2px;
+  border-bottom:1px solid var(--rule);text-decoration:none}
+.w-menu__a .w-menu__t{font-family:var(--font-display,inherit);font-size:24px;color:var(--ink)}
+.w-menu__a--sub .w-menu__t{font-family:inherit;font-size:16px;font-weight:500;color:var(--ink-mute)}
+.w-menu__a:hover .w-menu__t,.w-menu__a:focus-visible .w-menu__t{color:var(--ink)}
 .w-nav__link{position:relative;font-size:15px;font-weight:500;text-decoration:none;
   padding:.35rem 0;white-space:nowrap;color:var(--ink-mute);transition:color .3s var(--ease)}
 .w-nav__link:hover,.w-nav__link[aria-current="page"]{color:var(--ink)}
@@ -150,6 +164,10 @@ html:not([data-drop-js]) .w-has:focus-within .w-drop{display:block}
   border:1px solid transparent;background:transparent;font:inherit;font-size:14px;
   font-weight:500;color:var(--ink-mute);transition:color .25s var(--ease)}
 .w-icon:hover{color:var(--ink)}
+/* Shown only below 1000px, where .w-nav is hidden. One or the other, never both.
+   This must sit AFTER .w-icon: same specificity, so source order decides, and
+   above it the button stayed visible next to a nav that was already there. */
+.w-icon--menu{display:none}
 
 /* ---------- Buttons ---------- */
 .w-btn{position:relative;display:inline-flex;align-items:center;gap:10px;
@@ -561,6 +579,7 @@ body[data-thinking="on"] .w-think{display:block}
 }
 @media (max-width:999px){
   .w-nav{display:none}
+  .w-icon--menu{display:inline-flex}
   .w-think{position:static;max-width:none;margin:22px 0 0}
   .w-sec{min-height:0;padding-block:clamp(3.5rem,10vw,5rem)}
 }

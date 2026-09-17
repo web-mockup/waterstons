@@ -400,6 +400,44 @@
   function thinkGet() { try { return sessionStorage.getItem(THINK) === 'on'; } catch (e) { return false; } }
   function thinkSet(v) { try { sessionStorage.setItem(THINK, v ? 'on' : 'off'); } catch (e) {} }
 
+  /* Menu overlay: Escape closes, Tab cycles inside, focus returns to the button
+     that opened it, a click on the backdrop closes, and following a link closes
+     on the way out. */
+  function menu() {
+    var panel = $('#c-menu');
+    if (!panel) return;
+    var last = null;
+    function flag(v) { $$('[data-menu-open]').forEach(function (b) { b.setAttribute('aria-expanded', v); }); }
+    function open() {
+      last = document.activeElement;
+      panel.hidden = false;
+      document.body.style.overflow = 'hidden';
+      flag('true');
+      var f = $$('a[href],button:not([disabled])', panel)[0];
+      if (f) f.focus();
+    }
+    function close() {
+      panel.hidden = true;
+      document.body.style.overflow = '';
+      flag('false');
+      if (last) last.focus();
+    }
+    $$('[data-menu-open]').forEach(function (b) { b.addEventListener('click', open); });
+    $$('[data-menu-close]', panel).forEach(function (b) { b.addEventListener('click', close); });
+    panel.addEventListener('mousedown', function (e) { if (e.target === panel) close(); });
+    $$('a[href]', panel).forEach(function (a) { a.addEventListener('click', close); });
+    document.addEventListener('keydown', function (e) {
+      if (panel.hidden) return;
+      if (e.key === 'Escape') return close();
+      if (e.key !== 'Tab') return;
+      var f = $$('a[href],button:not([disabled])', panel);
+      if (!f.length) return;
+      var first = f[0], lastEl = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); lastEl.focus(); }
+      else if (!e.shiftKey && document.activeElement === lastEl) { e.preventDefault(); first.focus(); }
+    });
+  }
+
   function thinking() {
     var b = $('.c-tt');
     if (!b) return;
@@ -447,7 +485,7 @@
        its pause control, because one of those is a nicety and the other is a
        conformance requirement. */
     [['marquee', marquee], ['parallax', parallax], ['forms', forms],
-     ['video', video], ['thinking', thinking]].forEach(function (pair) {
+     ['video', video], ['thinking', thinking], ['menu', menu]].forEach(function (pair) {
       try { pair[1](); } catch (e) { fail(pair[0], e); }
     });
   }

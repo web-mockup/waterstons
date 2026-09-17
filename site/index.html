@@ -90,9 +90,44 @@
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
       </button>
       <a class="w-btn w-btn--primary w-btn--sm" href="../site/services/cyber.html#enquiry"><span class="w-btn__l">Talk to us</span></a>
+      <button class="w-icon w-icon--menu" type="button" data-menu-open aria-expanded="false"
+              aria-controls="w-menu" aria-label="Menu">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M3 7h18M3 17h18"/></svg>
+      </button>
     </div>
   </div>
 </header>
+
+<!-- Below 1000px the main nav is hidden, and until this existed nothing replaced
+     it: Option A, the option with the most pages, had no way to reach any of
+     them on a tablet or a part-width window. -->
+<div id="w-menu" class="w-menu" role="dialog" aria-modal="true" aria-labelledby="w-mtitle" hidden>
+  <div class="w-menu__in">
+    <div class="w-menu__top">
+      <span class="w-eyebrow" id="w-mtitle">Menu</span>
+      <button class="w-icon" type="button" data-menu-close aria-label="Close menu">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg>
+      </button>
+    </div>
+    <nav aria-label="All pages">
+      <a class="w-menu__a" href="index.html"><span class="w-menu__t">Home</span></a>
+      <span class="w-menu__h">What we do</span>
+      <a class="w-menu__a w-menu__a--sub" href="../site/services/cyber.html"><span class="w-menu__t">Cyber security</span></a>
+      <a class="w-menu__a w-menu__a--sub" href="index.html#work"><span class="w-menu__t">Technology</span></a>
+      <a class="w-menu__a w-menu__a--sub" href="index.html#work"><span class="w-menu__t">Data and AI</span></a>
+      <a class="w-menu__a w-menu__a--sub" href="index.html#work"><span class="w-menu__t">Advisory</span></a>
+      <span class="w-menu__h">Who we help</span>
+      <a class="w-menu__a w-menu__a--sub" href="index.html#sectors"><span class="w-menu__t">Energy</span></a>
+      <a class="w-menu__a w-menu__a--sub" href="index.html#sectors"><span class="w-menu__t">Housing and social care</span></a>
+      <a class="w-menu__a w-menu__a--sub" href="index.html#sectors"><span class="w-menu__t">Education</span></a>
+      <a class="w-menu__a w-menu__a--sub" href="index.html#sectors"><span class="w-menu__t">Manufacturing</span></a>
+      <a class="w-menu__a" href="index.html#clients"><span class="w-menu__t">Clients</span></a>
+      <a class="w-menu__a" href="../site/insights/rise-ai-assisted-subject-access-requests.html"><span class="w-menu__t">Thinking</span></a>
+      <a class="w-menu__a" href="index.html#careers"><span class="w-menu__t">Careers</span></a>
+      <a class="w-menu__a" href="../site/services/cyber.html#enquiry"><span class="w-menu__t">Talk to us</span></a>
+    </nav>
+  </div>
+</div>
 
 <main id="main">
 

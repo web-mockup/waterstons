@@ -382,6 +382,49 @@
   }
 
   /* ---- Search overlay, static UI with real focus management -------- */
+  /* One overlay helper for the search panel and the menu. They had identical
+     requirements, so search()'s trap is generalised rather than copied: Escape
+     closes, Tab cycles inside, focus returns to whatever opened it, a click on
+     the backdrop closes, and following a link closes on the way out. */
+  function overlay(panelSel, openSel, closeSel, focusSel) {
+    var panel = $(panelSel);
+    if (!panel) return;
+    var last = null;
+    function flag(v) { $$(openSel).forEach(function (b) { b.setAttribute('aria-expanded', v); }); }
+    function open() {
+      last = document.activeElement;
+      panel.hidden = false;
+      document.body.style.overflow = 'hidden';
+      flag('true');
+      var f = (focusSel && $(focusSel, panel)) || $$('a[href],button:not([disabled]),input,select,textarea', panel)[0];
+      if (f) { f.focus(); if (f.select) f.select(); }
+    }
+    function close() {
+      panel.hidden = true;
+      document.body.style.overflow = '';
+      flag('false');
+      if (last) last.focus();
+    }
+    $$(openSel).forEach(function (b) { b.addEventListener('click', open); });
+    $$(closeSel, panel).forEach(function (b) { b.addEventListener('click', close); });
+    panel.addEventListener('mousedown', function (e) { if (e.target === panel) close(); });
+    $$('a[href]', panel).forEach(function (a) { a.addEventListener('click', close); });
+    document.addEventListener('keydown', function (e) {
+      if (panel.hidden) return;
+      if (e.key === 'Escape') return close();
+      if (e.key !== 'Tab') return;
+      var f = $$('a[href],button:not([disabled]),input,select,textarea', panel);
+      if (!f.length) return;
+      var first = f[0], lastEl = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); lastEl.focus(); }
+      else if (!e.shiftKey && document.activeElement === lastEl) { e.preventDefault(); first.focus(); }
+    });
+  }
+
+  function menu() {
+    overlay('#w-menu', '[data-menu-open]', '[data-menu-close]', null);
+  }
+
   function search() {
     var panel = $('#w-search');
     if (!panel) return;
@@ -572,7 +615,7 @@
     /* Each beat isolated. This was a flat list, so one throw silently deleted
        every behaviour below it and the page still rendered, which is the hardest
        kind of failure to notice. */
-    [drops, sectionIndex, header, progress, magnetic, counters, curtain,
+    [drops, menu, sectionIndex, header, progress, magnetic, counters, curtain,
      accordion, tabs, video, search, thinking, region,
      disclosure, forms].forEach(function (fn) {
       try { fn(); } catch (e) { if (window.console) console.error(fn.name || 'beat', e); }

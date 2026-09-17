@@ -23,9 +23,34 @@
         <img src="../../assets/brand/logo-white.svg" alt="Waterstons" width="361" height="70">
       </a>
       <a class="c-btn" href="services/cyber.html#enquiry">Contact <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+      <button class="c-icon" type="button" data-menu-open aria-expanded="false"
+              aria-controls="c-menu" aria-label="Menu">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M3 7h18M3 17h18"/></svg>
+      </button>
     </div>
   </div>
 </header>
+<!-- Option C had no navigation at any width: a logo and a Contact button. This is
+     the whole set, reachable from every page. -->
+<div id="c-menu" class="c-menu" role="dialog" aria-modal="true" aria-labelledby="c-mtitle" hidden>
+  <div class="c-menu__in">
+    <div class="c-menu__top">
+      <span class="c-eyebrow" id="c-mtitle">Menu</span>
+      <button class="c-icon" type="button" data-menu-close aria-label="Close menu">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"/></svg>
+      </button>
+    </div>
+    <nav aria-label="All pages">
+      <a class="c-menu__a" href="index.html"><span>Home</span></a>
+      <a class="c-menu__a" href="services/cyber.html"><span>Cyber security</span></a>
+      <a class="c-menu__a" href="#work"><span>Our work</span></a>
+      <a class="c-menu__a" href="#clients"><span>Clients</span></a>
+      <a class="c-menu__a" href="#sectors"><span>Who we help</span></a>
+      <a class="c-menu__a" href="#people"><span>The people</span></a>
+      <a class="c-menu__a" href="services/cyber.html#enquiry"><span>Contact</span></a>
+    </nav>
+  </div>
+</div>
 
 <main id="main">
 
