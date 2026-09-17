@@ -64,6 +64,24 @@
         if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
       });
     }, { rootMargin: '0px 0px -10% 0px', threshold: 0.1 });
+    /* A .w-wipe clips its child, and the browser's own lazy loader is
+       IntersectionObserver machinery that reads a clipped box as an empty rect,
+       so the photograph inside cannot be fetched until the wipe lifts it. That
+       is the wrong way round, and it is visible: measured at 1870x950, three
+       photographs across these pages opened on an image that had not arrived.
+       The wipe element itself is not clipped, so promote its image when it comes
+       within 1200px of the viewport, which is what loading="lazy" would have
+       done unaided on a 4g connection. Nothing is fetched any earlier than lazy
+       already promised. Remove this only if the clip goes too. */
+    var pre = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        pre.unobserve(e.target);
+        var img = e.target.querySelector('img');
+        if (img && img.loading === 'lazy') img.loading = 'eager';
+      });
+    }, { rootMargin: '0px 0px 1200px 0px' });
+    $$('.w-wipe').forEach(function (el) { pre.observe(el); });
     items.forEach(function (el) {
       var r = el.getBoundingClientRect();
       if (r.top < innerHeight && r.bottom > 0) { el.classList.add('is-in', 'is-instant'); return; }

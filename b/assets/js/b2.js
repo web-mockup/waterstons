@@ -11,24 +11,96 @@
      scroller is exempt: an observer intersects on both axes, so a card parked
      beyond the fold would never be in the viewport when a vertical scroll
      passes it and would stay invisible for good. */
+  /* A WIPE OPENS A WINDOW ONTO A PHOTOGRAPH, SO THE PHOTOGRAPH HAS TO BE THERE.
+     Measured on the story figure at 1870x950: the image is lazy, the observer
+     fired while it was still undecoded (naturalWidth 0), and it first reported
+     paintable 516ms into a wipe that was already 95% open. The reader watched an
+     empty box draw itself and then the picture arrived all at once. That, not
+     frame rate, was the jump: the same run recorded a worst frame gap of 16.8ms
+     and zero dropped frames.
+
+     So a photograph waits until it can actually be painted. The 1s cap is the
+     standing guarantee, unchanged: nothing may stay hidden because a load event
+     never came, and an image that is slow, broken or never fetched reveals
+     anyway. */
+  /* THE WIPE WAS STOPPING THE PHOTOGRAPH FROM LOADING, WHICH IS WHY IT POPPED.
+     clip-path:inset(0 0 100% 0) on the <img> gives it an empty intersection
+     rect, and the browser's own lazy loader is that same machinery, so a lazy
+     photograph hidden by its own wipe is invisible to the thing that would have
+     fetched it. Controlled at 1870x950 with the figure parked 60px inside the
+     viewport: clip on and lazy, never loads at all; clip removed and still lazy,
+     loads; clip kept and eager, loads. The image could therefore only begin
+     loading at the instant the wipe removed the clip, and it arrived 516ms into
+     a 1.1s wipe that was 95% open by then.
+
+     This restores what the browser would have done by itself. The figure is not
+     clipped, only its image is, so the figure's own intersection is real: when
+     it comes within 1200px of the viewport, which is Chromium's own lazy
+     threshold on a 4g connection, the image is promoted and fetched. Nothing is
+     fetched earlier than loading="lazy" already promised, so the payload
+     argument is unchanged. DO NOT REMOVE THIS WITHOUT REMOVING THE CLIP. */
+  function preload(el) {
+    var img = el.querySelector('img');
+    if (img && img.loading === 'lazy') img.loading = 'eager';
+  }
+
+  function show(el) {
+    var img = el.classList.contains('t-wipe') && el.querySelector('img');
+    if (!img) { el.classList.add('is-on'); return; }
+    /* A gated photograph is not is-on yet, so anything that asks twice would
+       stack a second set of listeners and a second timer. The fallback below
+       asks on every scroll event. */
+    if (el.hasAttribute('data-awaiting')) return;
+    el.setAttribute('data-awaiting', '');
+    /* also here, not only in the observer: anything that reaches show() by
+       another door would otherwise wait on a load that cannot start */
+    preload(el);
+    var fired = false;
+    var go = function () {
+      if (fired) return;
+      fired = true;
+      el.removeAttribute('data-awaiting');
+      el.classList.add('is-on');
+    };
+    var painted = function () { if (img.decode) img.decode().then(go, go); else go(); };
+    setTimeout(go, 1000);
+    if (img.complete && img.naturalWidth) painted();
+    else {
+      img.addEventListener('load', painted, { once: true });
+      img.addEventListener('error', go, { once: true });
+    }
+  }
+
   function reveals() {
     var SEL = '.t-in, .t-mask, .t-wipe, .t-rule, .t-arcs';
     var items = $$(SEL).filter(function (el) { return !el.closest('.t-reel'); });
     /* anything inside a horizontal scroller is exempt: an observer intersects
        on both axes, so a card beyond the fold would never be in the viewport when
        a vertical scroll passes it, and would stay hidden for good */
-    $$('.t-reel .t-in, .t-reel .t-wipe, .t-reel .t-mask').forEach(function (el) { el.classList.add('is-on'); });
+    $$('.t-reel .t-in, .t-reel .t-wipe, .t-reel .t-mask').forEach(show);
     if (reduced || !('IntersectionObserver' in window)) {
       items.forEach(function (el) { el.classList.add('is-on'); });
       return;
     }
-    var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        e.target.classList.add('is-on');
-        io.unobserve(e.target);
-      });
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 });
+    function obs(margin, threshold, fn) {
+      var o = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          o.unobserve(e.target);
+          (fn || show)(e.target);
+        });
+      }, { rootMargin: margin, threshold: threshold });
+      return o;
+    }
+    /* TWO TRIGGERS, BECAUSE A PHOTOGRAPH IS NOT A PARAGRAPH. A tall figure
+       crossing 5% of its own height is still 91% of the way down the screen
+       (measured: top edge at 863px of a 950px viewport), so the wipe played on an
+       87px sliver at the very bottom of the reader's vision and had finished
+       before the picture was properly in view. A photograph now waits until its
+       top edge is four fifths down the screen and draws where it can be seen. */
+    var io = obs('0px 0px -6% 0px', 0.05);
+    var iw = obs('0px 0px -20% 0px', 0.01);
+    var ip = obs('0px 0px 1200px 0px', 0, preload);
     /* Anything already on screen at load was being marked finished immediately,
        so the entire first viewport never animated: the landing screen was
        static by construction. It now plays on the next frame instead, which
@@ -37,14 +109,15 @@
     var onscreen = [];
     items.forEach(function (el) {
       var r = el.getBoundingClientRect();
+      if (el.classList.contains('t-wipe')) ip.observe(el);
       if (r.top < innerHeight && r.bottom > 0) { onscreen.push(el); return; }
-      io.observe(el);
+      (el.classList.contains('t-wipe') ? iw : io).observe(el);
     });
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         onscreen.forEach(function (el, i) {
           el.style.transitionDelay = Math.min(i * 45, 420) + 'ms';
-          el.classList.add('is-on');
+          show(el);
         });
       });
     });
@@ -53,7 +126,7 @@
       var n = e.target;
       while (n && n !== document.body) {
         if (n.classList && (n.classList.contains('t-in') || n.classList.contains('t-wipe') ||
-            n.classList.contains('t-mask'))) n.classList.add('is-on');
+            n.classList.contains('t-mask'))) show(n);
         n = n.parentElement;
       }
     });
@@ -70,11 +143,25 @@
        reveals what is at or above the fold and then keeps doing that on scroll.
        Nothing visible is ever hidden; nothing below the fold is spent early. */
     var fallback = false;
+    /* The fallback runs on every scroll once it is armed, so whatever rule it
+       uses is the rule that governs for any reader who lands and pauses. It has
+       to agree with the observers or it silently overrides them: on its old
+       rule a photograph revealed the instant one pixel of it crossed the bottom
+       edge, which is the sliver trigger arriving by a different door.
+       The two escapes keep the guarantee absolute. A figure sitting entirely on
+       screen reveals, and so does everything on a page scrolled as far as it
+       goes, so nothing at the foot of a short document can be stranded. */
+    function due(el) {
+      var r = el.getBoundingClientRect();
+      if (!el.classList.contains('t-wipe')) return r.top < innerHeight;
+      return r.top < innerHeight * 0.82 || r.bottom <= innerHeight ||
+        innerHeight + window.pageYOffset >= document.documentElement.scrollHeight - 2;
+    }
     function reachable() {
       var pending = false;
       $$(SEL).forEach(function (el) {
-        if (el.classList.contains('is-on')) return;
-        if (el.getBoundingClientRect().top < innerHeight) el.classList.add('is-on');
+        if (el.classList.contains('is-on') || el.hasAttribute('data-awaiting')) return;
+        if (due(el)) show(el);
         else pending = true;
       });
       return pending;
