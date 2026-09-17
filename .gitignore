@@ -1,0 +1,31 @@
+# Private working material. Never commit anything under _private/.
+_private/
+
+# Client-supplied documents and internal planning notes.
+# Nothing of this kind belongs in a public repo, so exclude the formats outright.
+build-spec.md
+*build-spec*
+brief/
+*.pdf
+*.docx
+*.doc
+*.pptx
+
+# Reference captures and stray screenshots, working material only
+live-home.png
+Screenshot*.png
+Screen*Shot*.png
+
+# Review screenshots. Evidence for the review rather than part of the site:
+# nothing links to them, they are 7MB against a 1.3MB site, and a pitch that
+# argues for optimised media should not ship five times its own weight in PNGs.
+# Regenerate any time with: node assets/scratch/capture_b.mjs
+screenshots/
+
+# Working files, not part of the deliverable
+assets/scratch/
+node_modules/
+package.json
+package-lock.json
+.playwright-mcp/
+.DS_Store
