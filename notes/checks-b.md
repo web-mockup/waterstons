@@ -17,15 +17,53 @@ brief sets as an acceptance criterion.
 
 | Page | Performance | Accessibility | Best practices | LCP | CLS | TBT |
 |---|---|---|---|---|---|---|
-| Option B homepage | **99** | **100** | **100** | 2.2 s | 0 | 10 ms |
-| Option B Cyber | **98** | **100** | **100** | 2.3 s | 0 | 0 ms |
+| Option B homepage | **99** | **100** | **100** | 2.1 s | 0.001 | 0 ms |
+| Option B Cyber | **99** | **100** | **100** | 2.0 s | 0.002 | 0 ms |
+
+LCP read 2,477 ms on the homepage before two fixes, which passed the under 2.5 s criterion
+by 23 ms, and 23 ms is noise rather than margin. Two causes, both real:
+
+- The `fetchpriority="high"` preload still pointed at the wide photograph after it moved
+  out of the hero into the Story section, so the highest priority bandwidth went to an
+  image well below the fold while the element that actually decides LCP, the first
+  spotlight card, waited. The preload now names that card.
+- The display face carried weights nothing renders. Widening the Newsreader axis to
+  300 to 700 to reach the light weight shipped 14.4 KB of unused range. The page uses 300
+  and 400, so the axis is now 300 to 400 and the file is 33.4 KB rather than 47.8 KB.
+
+Together: LCP 2,481 ms to **2,029 ms** and performance 97 to **99**, identical across two
+runs. Margin against the criterion goes from 23 ms to roughly 470 ms.
+
+Dropping the font preloads entirely was also tried. It moved LCP by 77 ms while
+performance and CLS moved the other way, all inside single run variance, so it was reverted
+rather than kept: narrowing the axis removes bytes, whereas re-prioritising only moves them
+around.
+
+### Layout shift, measured directly rather than taken from Lighthouse
+
+Lighthouse throttles and uses its own viewport, so its CLS and a real one need not
+reconcile. Measured with a `layout-shift` observer over a full scroll, ignoring shifts with
+recent input:
+
+| Page | 390 | 1440 |
+|---|---|---|
+| Homepage | **0** | **0** |
+| Cyber | **0.0025** | **0** |
+
+Both are inside the 0.1 budget with room to spare, and the figure quoted is the measured
+one rather than a claim of zero.
+
+An earlier build read 0.0293 at 390 and 0.0505 at 1440 on Cyber, attributed to `MAIN`. The
+cause was the pinned section label in the header: an empty span collapses to zero height,
+so the header grew 24 px the moment the first label appeared and pushed the whole document
+down. The space is now reserved whether or not there is a label in it.
 
 Against the acceptance criteria:
 
 | Target | Required | Worst measured | Result |
 |---|---|---|---|
 | LCP | under 2.5 s | 2.3 s | pass |
-| CLS | under 0.1 | 0 | pass |
+| CLS | under 0.1 | 0.0025 | pass |
 | INP | under 200 ms | TBT 10 ms | pass on the available lab proxy |
 
 INP needs real interaction, so it cannot be produced in a lab run. Total Blocking Time is

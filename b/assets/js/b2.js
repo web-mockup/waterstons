@@ -12,8 +12,12 @@
      beyond the fold would never be in the viewport when a vertical scroll
      passes it and would stay invisible for good. */
   function reveals() {
-    var items = $$('.t-in').filter(function (el) { return !el.closest('.t-reel'); });
-    $$('.t-reel .t-in').forEach(function (el) { el.classList.add('is-on'); });
+    var SEL = '.t-in, .t-mask, .t-wipe, .t-rule, .t-arcs';
+    var items = $$(SEL).filter(function (el) { return !el.closest('.t-reel'); });
+    /* anything inside a horizontal scroller is exempt: an observer intersects
+       on both axes, so a card beyond the fold would never be in the viewport when
+       a vertical scroll passes it, and would stay hidden for good */
+    $$('.t-reel .t-in, .t-reel .t-wipe, .t-reel .t-mask').forEach(function (el) { el.classList.add('is-on'); });
     if (reduced || !('IntersectionObserver' in window)) {
       items.forEach(function (el) { el.classList.add('is-on'); });
       return;
@@ -34,12 +38,14 @@
     document.addEventListener('focusin', function (e) {
       var n = e.target;
       while (n && n !== document.body) {
-        if (n.classList && n.classList.contains('t-in')) n.classList.add('is-on');
+        if (n.classList && (n.classList.contains('t-in') || n.classList.contains('t-wipe') ||
+            n.classList.contains('t-mask'))) n.classList.add('is-on');
         n = n.parentElement;
       }
     });
     /* nothing may stay faded because an observer never fired */
-    setTimeout(function () { $$('.t-in').forEach(function (el) { el.classList.add('is-on'); }); }, 2500);
+    /* nothing may stay hidden because an observer never fired */
+    setTimeout(function () { $$(SEL).forEach(function (el) { el.classList.add('is-on'); }); }, 2500);
   }
 
   /* The header gains a rule once the page has moved, and carries the name of
@@ -220,10 +226,159 @@
     });
   }
 
+  /* Split display type into per word masks so the words rise out of an
+     overflow box. Transform only: the type is at full contrast for every frame
+     it is visible, which a fade cannot promise. */
+  function masks() {
+    if (reduced) return;
+    /* the hero headline alone: at nine headings a per word rise stops being a
+       moment and becomes a tic, which is how a distinctive page reads as a template */
+    $$('.t-hero .t-d1').forEach(function (el) {
+      if (el.dataset.split) return;
+      var parts = el.innerHTML.split(/(<[^>]+>)/);
+      var out = '', i = 0;
+      parts.forEach(function (chunk) {
+        if (chunk.charAt(0) === '<') { out += chunk; return; }
+        chunk.split(/(\s+)/).forEach(function (w) {
+          if (!w.trim()) { out += w; return; }
+          out += '<span class="t-mask"><i style="transition-delay:' + (i * 35) + 'ms">' + w + '</i></span>';
+          i++;
+        });
+      });
+      el.innerHTML = out;
+      el.dataset.split = '1';
+    });
+  }
+
+  /* M1. Three arcs in the margin, assembled from the page's own sections.
+
+     Each arc spans a run of sections and advances one step per section,
+     completing on the last of its run, so the completed state is three arcs,
+     which is the mark. Nine sections on the homepage make runs of 3, 3 and 3;
+     eight on Cyber make 3, 3 and 2. The hero is not a section: it carries no
+     label, and the rule for that column is that it holds a label or an index of
+     labels, so no label means no arc.
+
+     Discrete by construction. Every step lands on a section boundary and
+     nothing is driven by a scroll percentage, because a continuous value
+     through a nested form is a progress ring, which is where this started. */
+  function watch() {
+    var el = $('.t-watch');
+    if (!el) return;
+    var labels = $$('h2.t-lab').filter(function (l) {
+      return getComputedStyle(l).display !== 'none';
+    });
+    var secs = labels.map(function (l) { return l.closest('section'); }).filter(Boolean);
+    var n = secs.length;
+    if (!n) { el.remove(); return; }
+
+    /* split n across three arcs as evenly as possible, outer arc first */
+    var runs = [], base = Math.floor(n / 3), extra = n % 3;
+    for (var i = 0; i < 3; i++) runs.push(base + (i < extra ? 1 : 0));
+
+    var paths = $$('path', el), count = $('.t-watch__n', el);
+    /* getTotalLength can throw on a hidden or detached SVG, and the fallback is
+       a working device with a guessed dash length rather than a dead one. It is
+       a handled case, so it warns once instead of rethrowing: silent would hide
+       it, rethrowing would cry wolf about something that still works. */
+    var measured = true;
+    paths.forEach(function (p) {
+      try { var L = Math.ceil(p.getTotalLength()); p.style.setProperty('--len', L); p.dataset.len = L; }
+      catch (e) { p.dataset.len = 120; measured = false; }
+    });
+    if (!measured) warn('watch: could not measure arc length, using a fallback');
+
+    /* full: draw every arc regardless of position, but still mark where you are.
+       Under reduced motion the assembly is the decoration and the marking is the
+       information, so the information survives and the assembly does not. */
+    function draw(cur, full) {
+      var start = 0;
+      for (var i = 0; i < 3; i++) {
+        var len = runs[i], done = Math.max(0, Math.min(len, cur - start));
+        var p = paths[i];
+        if (!p) { start += len; continue; }
+        var L = parseFloat(p.dataset.len) || 120;
+        var frac = full ? 1 : (len ? done / len : 0);
+        p.style.setProperty('--off', (L * (1 - frac)).toFixed(1));
+        if (cur > start && cur <= start + len) p.setAttribute('data-live', '');
+        else p.removeAttribute('data-live');
+        start += len;
+      }
+      if (count) count.textContent = cur ? cur + '/' + n : '';
+    }
+
+    function up() {
+      var cur = 0, mid = innerHeight * 0.42;
+      secs.forEach(function (s, i) {
+        if (s.getBoundingClientRect().top <= mid) cur = i + 1;
+      });
+      draw(cur, reduced);
+    }
+    var tick = false;
+    addEventListener('scroll', function () {
+      if (tick) return; tick = true;
+      requestAnimationFrame(function () { up(); tick = false; });
+    }, { passive: true });
+    up();
+    /* transitions come on only after the first draw has landed */
+    requestAnimationFrame(function () { el.setAttribute('data-ready', ''); });
+  }
+
+  /* Give every arc its true path length, so the draw is honest rather than
+     a guessed dash value that over or undershoots. */
+  function arcs() {
+    var ok = true;
+    $$('.t-arcs path').forEach(function (p) {
+      try { var l = Math.ceil(p.getTotalLength()); if (l) p.style.setProperty('--len', l); }
+      catch (e) { ok = false; }
+    });
+    if (!ok) warn('arcs: could not measure path length, using the declared fallback');
+  }
+
+  /* Restore the safe state, then re-surface. A catch that only restores makes
+     the page safe and its failures invisible, which is the same mode as an
+     exception at the head of init, except guaranteed rather than accidental:
+     the motion could be entirely dead on the live site with no console error,
+     no uncaught exception and a page that looks finished. It also makes
+     "uncaught 0" true by construction, so the evidence stops meaning anything.
+     The visitor keeps a working page and the check keeps its signal. */
+  /* handled and still working: say so once, do not rethrow */
+  function warn(msg) { try { console.warn('[b2] ' + msg); } catch (x) {} }
+
+  function fail(where, e) {
+    try { console.error('[b2] ' + where + ' failed, motion degraded', e); } catch (x) {}
+    setTimeout(function () { throw e; }, 0);
+  }
+
+  /* Only a page that has proved it can run the reveal machinery is allowed to
+     hide anything. The flag goes on before the beats and comes straight back
+     off if any of them throws, so a page that fails halfway is a page with
+     everything visible rather than a text document with the photographs gone. */
   function init() {
-    reveals(); head(); index(); region(); accordion(); video(); forms(); journey();
-    overlay('#t-search', '[data-search-open]', '[data-search-close]', 'input[type="search"]');
-    overlay('#t-menu', '[data-menu-open]', '[data-menu-close]', null);
+    var root = document.documentElement;
+    try {
+      root.setAttribute('data-motion', '');
+      masks();
+      arcs();
+      reveals();
+    } catch (e) {
+      root.removeAttribute('data-motion');
+      $$('.t-in, .t-mask, .t-wipe, .t-rule, .t-arcs').forEach(function (el) {
+        el.classList.add('is-on');
+      });
+      fail('reveals', e);
+    }
+    /* each beat isolated, so one failure does not take the rest, and each
+       reported, so a dead beat is never silent */
+    [['head', head], ['watch', watch], ['index', index], ['region', region],
+     ['accordion', accordion], ['video', video], ['forms', forms],
+     ['journey', journey]].forEach(function (pair) {
+      try { pair[1](); } catch (e) { fail(pair[0], e); }
+    });
+    try {
+      overlay('#t-search', '[data-search-open]', '[data-search-close]', 'input[type="search"]');
+      overlay('#t-menu', '[data-menu-open]', '[data-menu-close]', null);
+    } catch (e) { fail('overlays', e); }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
