@@ -315,12 +315,10 @@
         if (!img) return;
         var r = f.getBoundingClientRect();
         if (r.bottom < -80 || r.top > window.innerHeight + 80) return;
-        /* -128px at the extremes rather than -46. The frame is oversized by
-           48% with a -24% offset, so 24% of the frame height is headroom on
-           each side and the travel can never expose an edge. At 660px that is
-           158px of room for 128px of movement. */
         var mid = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight;
-        img.style.setProperty('--y', (clamp(mid, -1, 1) * -128).toFixed(1));
+        /* 12% of headroom each way on a contained plate, so the travel stays
+           inside ground the image already covers. */
+        img.style.setProperty('--y', (clamp(mid, -1, 1) * -54).toFixed(1));
       });
     }
     window.addEventListener('scroll', function () {

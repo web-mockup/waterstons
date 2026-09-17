@@ -380,8 +380,29 @@ ul,ol{padding:0;list-style:none}
    colleagues in real buildings is the one element a competitor cannot copy.
    Every plate carries a caption, at every screen size, in the client's voice.
    ============================================================ */
-.c-plate{position:relative;margin-block:clamp(52px,8vw,110px)}
-.c-plate__f{position:relative;overflow:hidden;height:clamp(300px,64vh,660px)}
+/* CONTAINED, NOT FULL BLEED, BECAUSE THE SOURCES CANNOT FILL THE SCREEN.
+   The photographs are 1000x667 and 800x533. Spanning the viewport rendered
+   them at 1873x901 and 2038x981, which is 1.9 and 2.5 times their native
+   resolution: not a crop, an enlargement, and that is what soft looks like.
+   680px is sized for a RETINA screen, not a nominal one: at that width the
+   plates render about 554 CSS pixels, so a 2x display asks for 1108 device
+   pixels against sources of 1000, 800 and 760. That is 1.1 to 1.5, against 3.7
+   to 5.1 when they spanned the viewport. The largest published source is
+   1000px wide, so this is the ceiling the assets impose rather than a
+   preference: smaller is not a compromise here, it is the only size the
+   pictures actually have. */
+/* In the frame and aligned to it, not centred on the screen. A 680px plate
+   with margin auto floats in the middle of a wide page with the act's own
+   label stranded at the left, which reads as two unrelated things. It sits in
+   the frame like everything else, and the caption takes the room the picture
+   no longer needs rather than leaving it blank. */
+.c-plate{position:relative;margin-block:clamp(40px,6vw,84px);
+  max-width:var(--frame);margin-inline:auto;padding-inline:var(--edge);
+  display:grid;gap:clamp(14px,2.4vw,40px);align-items:end}
+@media (min-width:900px){
+  .c-plate{grid-template-columns:minmax(0,680px) minmax(0,1fr)}
+}
+.c-plate__f{position:relative;overflow:hidden;aspect-ratio:3/2;height:auto}
 .c-plate__f img{width:100%;height:100%;object-fit:cover;object-position:center}
 
 /* THE PLATES ARE THE LOUDEST THING ON THIS PAGE, OR THEY ARE POINTLESS.
@@ -400,15 +421,14 @@ ul,ol{padding:0;list-style:none}
 [data-motion] .c-plate__f{clip-path:inset(0 0 100% 0);
   transition:clip-path 1.25s var(--ease-out)}
 [data-motion] .c-plate.is-on .c-plate__f{clip-path:inset(0 0 0 0)}
-[data-motion] .c-plate__f img{height:148%;top:-24%;position:absolute;left:0;
+[data-motion] .c-plate__f img{height:124%;top:-12%;position:absolute;left:0;
   transform:translate3d(0,calc(var(--y,0) * 1px),0) scale(var(--s,1.09));
   transition:transform 2.6s var(--ease-out);will-change:transform}
 [data-motion] .c-plate.is-on .c-plate__f img{--s:1}
 /* Once it has arrived the transition comes off, so the counter-scroll tracks
    the scroll instead of easing a second and a half behind it. */
 [data-motion] .c-plate.is-on[data-settled] .c-plate__f img{transition:none}
-.c-plate__c{display:grid;gap:4px;margin-top:16px;max-width:var(--frame);
-  margin-inline:auto;padding-inline:var(--edge)}
+.c-plate__c{display:grid;gap:5px;align-content:end;padding-bottom:4px}
 .c-plate__n{font-size:13px;font-weight:600;letter-spacing:.4px;color:var(--on-navy)}
 .c-plate__d{font-size:14px;color:var(--on-navy-2)}
 @media (prefers-reduced-motion:reduce){
