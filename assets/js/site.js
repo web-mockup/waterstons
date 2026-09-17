@@ -509,10 +509,30 @@
   }
 
   function init() {
-    maskHeadings(); resolveWords(); reveals(); failsafe();
-    rotator(); sectionIndex(); header(); progress(); magnetic(); counters(); curtain();
-    accordion(); tabs(); video(); search(); thinking(); journey(); region();
-    disclosure(); forms();
+    var root = document.documentElement;
+    /* NOTHING IS HIDDEN UNTIL A SCRIPT HAS PROVED IT CAN RUN. data-motion is what
+       switches every hiding rule in the stylesheet on, so a page without
+       JavaScript, with a blocked script, or with a throw in any motion beat, is a
+       page that simply arrived. Measured before this: JavaScript off left 48
+       elements at opacity 0 and five photographs clipped to nothing.
+       The rotator is inside this group deliberately: if it throws, dropping
+       data-motion is also what makes the no-motion rule show its first phrase. */
+    try {
+      root.setAttribute('data-motion', '');
+      maskHeadings(); resolveWords(); reveals(); failsafe(); rotator();
+    } catch (e) {
+      root.removeAttribute('data-motion');
+      $$(REVEAL).forEach(function (el) { el.classList.add('is-in'); });
+      if (window.console) console.error('motion', e);
+    }
+    /* Each beat isolated. This was a flat list, so one throw silently deleted
+       every behaviour below it and the page still rendered, which is the hardest
+       kind of failure to notice. */
+    [sectionIndex, header, progress, magnetic, counters, curtain,
+     accordion, tabs, video, search, thinking, journey, region,
+     disclosure, forms].forEach(function (fn) {
+      try { fn(); } catch (e) { if (window.console) console.error(fn.name || 'beat', e); }
+    });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

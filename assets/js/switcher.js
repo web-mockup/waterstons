@@ -80,6 +80,20 @@
   wrap.innerHTML = html + '</select>';
   document.body.appendChild(wrap);
 
+  /* THE SWITCHER IS PINNED BOTTOM CENTRE, AND SO IS ANYTHING ELSE THAT WANTS TO
+     BE. Publish the height it occupies so those can sit clear of it instead of
+     guessing at a number that goes stale the moment this pill changes size.
+     Option A's journey pill was pinned to exactly the same spot and simply
+     landed underneath: same left:50%, same bottom, lower z-index, so the
+     switcher covered its middle and its two ends stuck out either side. */
+  function publish() {
+    var h = wrap.getBoundingClientRect().height;
+    document.documentElement.style.setProperty('--b-switch-clear', Math.round(h + 16 + 10) + 'px');
+  }
+  publish();
+  addEventListener('resize', publish, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(publish).observe(wrap);
+
   document.getElementById('b-switch-sel').addEventListener('change', function (e) {
     location.href = e.target.value + location.search + location.hash;
   });

@@ -432,7 +432,11 @@ h3{font-size:clamp(1.15rem,1.6vw,1.4rem);line-height:1.2;letter-spacing:-.018em}
 .w-sfoot{border-top:1px solid var(--rule);padding-top:16px;font-size:13px;color:var(--ink-faint)}
 
 /* ---------- Presentation aids ---------- */
-.w-journey{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:150;
+/* Sits above the option switcher, which is pinned to the same place. The
+   switcher publishes the height it occupies; 18px is the resting value for a
+   page with no switcher on it, so removing the mockup device needs no edit. */
+.w-journey{position:fixed;left:50%;transform:translateX(-50%);
+  bottom:var(--b-switch-clear, 18px);z-index:150;
   display:none;align-items:center;gap:14px;background:var(--navy);color:#fff;
   border-radius:999px;padding:7px 8px 7px 20px;font-size:13px;
   box-shadow:0 12px 34px rgba(15,31,52,.28);max-width:calc(100% - 2rem)}
@@ -472,18 +476,29 @@ body[data-thinking="on"] .w-think{display:block}
 
 /* opacity switches discretely, only the transform eases, so text is never
    rendered semi transparent for an auditor or a reader */
-.w-rev{opacity:0;transform:translate3d(0,24px,0);transition:transform .85s var(--ease)}
+/* THE RESTING STATE IS THE FINISHED PAGE. Every declaration below that hides
+   something is gated on [data-motion], which the script sets on <html> only once
+   it has proved it can run, and removes again if any motion beat throws. Without
+   it, or without the script at all, the page is simply arrived. Measured before
+   this: with JavaScript off, 48 elements sat at opacity 0 and five photographs
+   were clipped to nothing. Deferred scripts run before first paint, so there is
+   no flash of visible-then-hidden: data-motion lands 44ms ahead of FCP at 6x CPU
+   throttling. Options B and C already worked this way; A did not. */
+.w-rev{transition:transform .85s var(--ease)}
+[data-motion] .w-rev{opacity:0;transform:translate3d(0,24px,0)}
 .w-rev.is-in{opacity:1;transform:none}
 .w-rev--d1{transition-delay:.07s}.w-rev--d2{transition-delay:.14s}.w-rev--d3{transition-delay:.21s}
 .is-instant,.is-instant *{transition:none !important;animation:none !important}
 
-.w-wipe > *{clip-path:inset(0 0 100% 0)}
+[data-motion] .w-wipe > *{clip-path:inset(0 0 100% 0)}
 .w-wipe.is-in > *{clip-path:inset(0 0 0 0);transition:clip-path 1.1s var(--ease)}
-.w-wipe img{transform:scale(1.05);transition:transform 1.6s var(--ease)}
+.w-wipe img{transition:transform 1.6s var(--ease)}
+[data-motion] .w-wipe img{transform:scale(1.05)}
 .w-wipe.is-in img{transform:scale(1)}
 
-.w-list .w-list__row,.w-cards .w-card,.w-stats > div{opacity:0;transform:translate3d(0,20px,0);
-  transition:transform .8s var(--ease)}
+.w-list .w-list__row,.w-cards .w-card,.w-stats > div{transition:transform .8s var(--ease)}
+[data-motion] .w-list .w-list__row,[data-motion] .w-cards .w-card,
+[data-motion] .w-stats > div{opacity:0;transform:translate3d(0,20px,0)}
 .w-list.is-in .w-list__row,.w-cards.is-in .w-card,.w-stats.is-in > div{opacity:1;transform:none}
 .w-list.is-in .w-list__row:nth-child(2),.w-cards.is-in .w-card:nth-child(2),
 .w-stats.is-in > div:nth-child(2){transition-delay:.06s}
@@ -544,7 +559,12 @@ body[data-thinking="on"] .w-think{display:block}
   .w-hero__ctas{flex-direction:column;align-items:stretch}
   .w-hero__ctas .w-btn{justify-content:center}
   .w-facts{margin-left:0;width:100%}
-  .w-tt{right:12px;bottom:70px;font-size:12px}
+  /* Narrow screens stack three pinned aids in one corner: the option switcher,
+     this, and the journey pill. All three now derive from the height the
+     switcher publishes, so the stack stays in order if any of them changes size
+     and collapses to sensible resting values if the switcher is not there. */
+  .w-tt{right:12px;bottom:var(--b-switch-clear, 70px);font-size:12px}
+  .w-journey{bottom:calc(var(--b-switch-clear, 18px) + 50px)}
   .w-peek{display:none}
 }
 
@@ -582,7 +602,8 @@ body[data-thinking="on"] .w-think{display:block}
     gap:0 clamp(2.5rem,5vw,72px);align-items:baseline}
   .w-step__d{margin-top:0}
 }
-.w-steps .w-step{opacity:0;transform:translate3d(0,20px,0);transition:transform .8s var(--ease)}
+.w-steps .w-step{transition:transform .8s var(--ease)}
+[data-motion] .w-steps .w-step{opacity:0;transform:translate3d(0,20px,0)}
 .w-steps.is-in .w-step{opacity:1;transform:none}
 .w-steps.is-in .w-step:nth-child(2){transition-delay:.06s}
 .w-steps.is-in .w-step:nth-child(3){transition-delay:.12s}
@@ -598,7 +619,8 @@ body[data-thinking="on"] .w-think{display:block}
 
 /* ---- Word and character masks ---- */
 .w-mask{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.06em;margin-bottom:-.06em}
-.w-in{display:inline-block;transform:translate3d(0,110%,0);will-change:transform}
+.w-in{display:inline-block;will-change:transform}
+[data-motion] .w-in{transform:translate3d(0,110%,0)}
 .is-in .w-in,.w-in.is-in{transform:none}
 .w-mask .w-in{transition:transform .95s cubic-bezier(.16,1,.3,1)}
 
@@ -615,6 +637,12 @@ body[data-thinking="on"] .w-think{display:block}
 .w-rot__item[data-state="in"] .w-in{transform:none}
 .w-rot__item[data-state="wait"] .w-in{transform:translate3d(0,115%,0);transition:none}
 .w-rot__item .w-in{transition-delay:calc(var(--i,0) * 38ms)}
+
+/* With no motion layer the rotator has nothing cycling it, and its phrases are
+   absolutely positioned on top of each other. Show the first one, in flow. */
+html:not([data-motion]) .w-rot__sizer{display:none}
+html:not([data-motion]) .w-rot__slot,html:not([data-motion]) .w-rot__item{position:static}
+html:not([data-motion]) .w-rot__item + .w-rot__item{display:none}
 
 /* ---- Scroll resolve. Copy starts at the faint tier and settles to full
    ink as it passes through. Both tiers pass AA, so it is readable at
@@ -653,9 +681,10 @@ body[data-thinking="on"] .w-think{display:block}
 .w-btn{will-change:transform}
 
 /* ---- Media wipe ---- */
-.w-wipe > *{clip-path:inset(0 0 100% 0)}
+[data-motion] .w-wipe > *{clip-path:inset(0 0 100% 0)}
 .w-wipe.is-in > *{clip-path:inset(0 0 0 0);transition:clip-path 1.2s cubic-bezier(.16,1,.3,1)}
-.w-wipe img{transform:scale(1.06);transition:transform 1.8s cubic-bezier(.16,1,.3,1)}
+.w-wipe img{transition:transform 1.8s cubic-bezier(.16,1,.3,1)}
+[data-motion] .w-wipe img{transform:scale(1.06)}
 .w-wipe.is-in img{transform:scale(1)}
 
 /* ---- Counters ---- */
