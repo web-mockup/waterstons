@@ -115,6 +115,7 @@ Added when the Sector page was built, to evidence Section 8's request for templa
 | Sector page | Enva and VARO named as Energy sector clients | `/sectors/it-services-energy-sector` |
 | Sector page | Articles: "CAF 4.0 Summer 2025 release - what's new?" (Aug 2025, Max Muir); "Demystifying the Cyber Assessment Framework (CAF)" (Apr 2025). NCSC reviews the CAF every 12 to 24 months; version 4.0 released 6 August 2025 | `/sectors/it-services-energy-sector` |
 | Sector page, all pages | "Ready to reimagine your business? We're with you."; office +44 345 094 0945, service desk +44 345 094 0944, info@waterstons.com | `/sectors/it-services-energy-sector` |
+| Sector page | Offshore wind photograph in the Energy hero (`energy-wide-1400.webp`) | Supplied by the client for this page |
 
 **Not used:** the live Energy page leads on a stock photograph of a model in hi-vis holding a
 tablet. Section 7 of the brief asks for "Photography of real employees (not stock or AI)", so it
